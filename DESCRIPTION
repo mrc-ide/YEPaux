@@ -1,0 +1,23 @@
+Package: YFDaux
+Type: Package
+Title: Yellow Fever Dynamics Auxiliary Functions
+Version: 0.1.0
+Authors@R: person("Keith", "Fraser", email = "keith.fraser@imperial.ac.uk", role = c("aut", "cre"))
+Maintainers@R: person("Keith", "Fraser", email = "keith.fraser@imperial.ac.uk", role = c("aut", "cre"))
+Description: R package containing auxiliary functions for use with YellowFeverDynamics package. These functions have been split off to reduce the complexity of the main package.
+Depends: R (>= 4.2.0)
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Imports:
+    assertthat,
+    coda,
+    ggplot2,
+    graphics,
+    grDevices,
+    Rmisc,
+    sf,
+    stats,
+    utils,
+    YellowFeverDynamics
