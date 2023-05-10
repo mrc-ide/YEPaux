@@ -20,11 +20,11 @@ t_infectious <- 5 #Time cases remain infectious
 #' @importFrom utils read.csv write.csv
 #' @import YellowFeverDynamics
 #-------------------------------------------------------------------------------
-#' @title convert_model_output_combine_by_age
+#' @title convert_model_output_combine_by_age # TODO - Amend to deal with different outputs
 #'
 #' @description Convert SEIRV output of other functions to combine values across ages
 #'
-#' @details Takes in the output of the Full_Model_Run(), Basic_Model_Run() and similar functions and sums together
+#' @details Takes in the output of YEP::Model_Run and similar functions and sums together
 #' S, E, I, R, and V values across age groups, outputting a list containing arrays of values by particle and time point
 #'
 #' @param model_output List of output data produced by appropriate functions
@@ -40,16 +40,17 @@ convert_model_output_combine_by_age <- function(model_output=list()){
   n_particles=dim(model_output$S)[2]
   t_pts=dim(model_output$S)[3]
   blank=array(0,dim=c(n_particles,t_pts))
-  S_sum=E_sum=I_sum=R_sum=V_sum=blank
+  S_sum=E_sum=I_sum=R_sum=V_sum=C_sum=blank
   for(i in 1:N_age){
     S_sum=S_sum+model_output$S[i,,]
     E_sum=E_sum+model_output$E[i,,]
     I_sum=I_sum+model_output$I[i,,]
     R_sum=R_sum+model_output$R[i,,]
     V_sum=V_sum+model_output$V[i,,]
+    C_sum=C_sum+model_output$C[i,,]
   }
 
-  return(list(day=model_output$day,year=model_output$year,S=S_sum,E=E_sum,I=I_sum,R=R_sum,V=V_sum))
+  return(list(day=model_output$day,year=model_output$year,S=S_sum,E=E_sum,I=I_sum,R=R_sum,V=V_sum,C=C_sum))
 }
 #-------------------------------------------------------------------------------
 #' @title plot_model_output
