@@ -18,7 +18,7 @@ t_infectious <- 5 #Time cases remain infectious
 #' @importFrom sf read_sf st_bbox st_geometry
 #' @importFrom stats cov dexp dnbinom dnorm prop.test rbinom runif
 #' @importFrom utils read.csv write.csv
-#' @import YellowFeverDynamics
+#' @import YEP
 #-------------------------------------------------------------------------------
 #' @title convert_model_output_combine_by_age # TODO - Amend to deal with different outputs
 #'
@@ -72,8 +72,8 @@ plot_model_output <- function(model_output=list()){
   values=label=values_mean=values_low=values_high=NULL
   n_particles=dim(model_output$S)[2]
   t_pts=dim(model_output$S)[3]
-  date_values=model_output$year[1,1]+((model_output$day[1,]-model_output$day[1,1]+1)/365.0)
-  xlabels=c(model_output$year[1,1]:(model_output$year[1,t_pts]+1))
+  date_values=model_output$year[1]+((model_output$day-model_output$day[1]+1)/365.0)
+  xlabels=c(model_output$year[1]:(model_output$year[t_pts]+1))
   ylabels=10^c(-1:10)
 
   if(n_particles==1){
@@ -110,7 +110,7 @@ plot_model_output <- function(model_output=list()){
     plot1 <- ggplot(data=data_combined,aes(x=date_values,y=log(values_mean),group=label))+theme_bw()
     plot1 <- plot1 + geom_line(aes(colour=label),size=1) + theme(legend.title=element_blank())
     plot1 <- plot1 + geom_errorbar(data=data_combined,aes(ymin=values_low,ymax=values_high,colour=label),
-                                   width=(model_output$day[1,2]-model_output$day[1,1])/365.0)
+                                   width=(model_output$day[2]-model_output$day[1])/365.0)
     plot1 <- plot1 + scale_x_continuous(name="",breaks=xlabels,labels=xlabels)
     plot1 <- plot1 + scale_y_continuous(name="",breaks=log(ylabels),labels=ylabels)
   }
@@ -137,7 +137,7 @@ convert_model_output_tidy <- function(model_output=list()){
   N_age=dim(model_output$S)[1]
   n_particles=dim(model_output$S)[2]
   t_pts=dim(model_output$S)[3]
-  date_values1=model_output$year[1,1]+((model_output$day[1,]-model_output$day[1,1]+1)/365.0)
+  date_values1=model_output$year[1]+((model_output$day-model_output$day[1]+1)/365.0)
   particle_values=date_values2=model_output$S
   for(i in 1:n_particles){
     particle_values[,i,]=array(i,dim=c(N_age,t_pts))

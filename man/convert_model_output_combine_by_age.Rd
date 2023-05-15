@@ -2,7 +2,7 @@
 % Please edit documentation in R/main.R
 \name{convert_model_output_combine_by_age}
 \alias{convert_model_output_combine_by_age}
-\title{convert_model_output_combine_by_age}
+\title{convert_model_output_combine_by_age # TODO - Amend to deal with different outputs}
 \usage{
 convert_model_output_combine_by_age(model_output = list())
 }
@@ -14,6 +14,6 @@ convert_model_output_combine_by_age(model_output = list())
 Convert SEIRV output of other functions to combine values across ages
 }
 \details{
-Takes in the output of the Full_Model_Run(), Basic_Model_Run() and similar functions and sums together
+Takes in the output of YEP::Model_Run and similar functions and sums together
 S, E, I, R, and V values across age groups, outputting a list containing arrays of values by particle and time point
 }
