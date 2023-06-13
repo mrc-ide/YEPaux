@@ -1,10 +1,10 @@
-Package: YFDaux
+Package: YEPaux
 Type: Package
 Title: Yellow Fever Dynamics Auxiliary Functions
 Version: 0.1.0
 Authors@R: person("Keith", "Fraser", email = "keith.fraser@imperial.ac.uk", role = c("aut", "cre"))
 Maintainers@R: person("Keith", "Fraser", email = "keith.fraser@imperial.ac.uk", role = c("aut", "cre"))
-Description: R package containing auxiliary functions for use with YellowFeverDynamics package. These functions have been split off to reduce the complexity of the main package.
+Description: R package containing auxiliary functions for use with the YEP package. These functions have been split off to reduce the complexity of the main package.
 Depends: R (>= 4.2.0)
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
@@ -20,4 +20,4 @@ Imports:
     sf,
     stats,
     utils,
-    YellowFeverDynamics
+    YEP

@@ -1,8 +1,6 @@
-# R file for general functions in YFDaux package
+# R file for general functions in YEPaux package
 #------------------------------------------------
 #Global variables
-p_severe_inf=0.12 #Probability that an infection is severe
-p_death_severe_inf=0.39 #Probability that a severe infection becomes fatal
 t_incubation <- 5 #Time for cases to incubate in mosquito
 t_latent <- 5 #Latent period before cases become infectious
 t_infectious <- 5 #Time cases remain infectious

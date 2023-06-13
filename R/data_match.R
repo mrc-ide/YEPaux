@@ -19,27 +19,23 @@
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param obs_outbreak_data Outbreak Y/N data for comparison, by region and year, in format 0 = no outbreaks,
-#'   1 = 1 or more outbreak(s)
 #' @param const_list = List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil)
+#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, TBA)
 #'
 #' @export
 #'
 data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,obs_case_data=NULL,
-                              obs_outbreak_data=NULL,const_list=list()) {
+                              const_list=list()) {
 
   assert_that(all(params>0),msg="All parameter values must be positive")
   assert_that(input_data_check(input_data),
-              msg="Input data must be in standard format (see https://mrc-ide.github.io/YellowFeverDynamics/articles/CGuideAInputs.html )")
-  assert_that(any(is.null(obs_sero_data)==FALSE,is.null(obs_case_data)==FALSE,is.null(obs_outbreak_data)==FALSE),
-              msg="Need at least one of obs_sero_data, obs_case_data or obs_outbreak_data")
+              msg="Input data must be in standard format (see https://mrc-ide.github.io/YEP/articles/CGuideAInputs.html )")
   assert_that(is.list(const_list)) #TODO - Better checks for const_list
 
   #Process input data to check that all regions with sero, case and/or outbreak data supplied are present, remove
   #regions without any supplied data, and add cross-referencing tables for use when calculating likelihood. Take
   #subset of environmental data (if used) and check that environmental data available for all regions
-  input_data=input_data_process(input_data,obs_sero_data,obs_case_data,obs_outbreak_data)
+  input_data=input_data_process(input_data,obs_sero_data,obs_case_data)
   regions=names(table(input_data$region_labels)) #Regions in new processed input data list
   n_regions=length(regions)
   if(const_list$type %in% c("FOI+R0 enviro","FOI enviro")){
@@ -112,10 +108,11 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
   }
 
   #Generate modelled data over all regions
-  dataset <- Generate_Dataset(input_data,FOI_values,R0_values,
-                              obs_sero_data,obs_case_data,obs_outbreak_data,
-                              vaccine_efficacy,p_rep_severe,p_rep_death,
-                              const_list$mode_start,const_list$n_reps,const_list$dt)
+  dataset <- Generate_Dataset(input_data,FOI_values,R0_values,obs_sero_data,obs_case_data,
+                              vaccine_efficacy,const_list$p_severe_inf,const_list$p_death_severe_inf,
+                              p_rep_severe,p_rep_death,const_list$mode_start,const_list$start_SEIRV,
+                              const_list$dt,const_list$n_reps,const_list$deterministic,
+                              const_list$mode_parallel,const_list$cluster)
 
   return(dataset)
 }
@@ -140,15 +137,13 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param obs_outbreak_data Outbreak Y/N data for comparison, by region and year, in format 0 = no outbreaks,
-#'   1 = 1 or more outbreak(s)
 #' @param const_list = List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-#'   vaccine_efficacy,p_rep_severe,p_rep_death)
+#'   vaccine_efficacy,p_rep_severe,p_rep_death, TBA)
 #'
 #' @export
 #'
 data_match_multi <- function(param_sets=list(),input_data=list(),obs_sero_data=NULL,obs_case_data=NULL,
-                             obs_outbreak_data=NULL,const_list=list()){
+                             const_list=list()){
 
   assert_that(is.data.frame(param_sets),msg="param_sets must be a data frame")
 
@@ -158,8 +153,7 @@ data_match_multi <- function(param_sets=list(),input_data=list(),obs_sero_data=N
   for(i in 1:n_param_sets){
     cat("\t",i)
     params=as.numeric(param_sets[i,])
-    model_data_all[[i]] <- data_match_single(params,input_data,obs_sero_data,obs_case_data,obs_outbreak_data,
-                                             const_list)
+    model_data_all[[i]] <- data_match_single(params,input_data,obs_sero_data,obs_case_data,const_list)
   }
 
   return(model_data_all)

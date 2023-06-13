@@ -9,7 +9,6 @@ data_match_single(
   input_data = list(),
   obs_sero_data = NULL,
   obs_case_data = NULL,
-  obs_outbreak_data = NULL,
   const_list = list()
 )
 }
@@ -25,11 +24,8 @@ positives}
 \item{obs_case_data}{Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 deaths}
 
-\item{obs_outbreak_data}{Outbreak Y/N data for comparison, by region and year, in format 0 = no outbreaks,
-1 = 1 or more outbreak(s)}
-
 \item{const_list}{= List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil)}
+vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, TBA)}
 }
 \description{
 Function which runs the model to create simulated data corresponding to supplied observed data for a
