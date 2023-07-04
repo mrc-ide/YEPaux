@@ -462,7 +462,7 @@ case_match_graphs <- function(model_data=list(),obs_case_data=list(),input_data=
                   death_model_low95=model_deaths_CI95_low[lines],death_model_high95=model_deaths_CI95_high[lines],
                   death_model_low50=model_deaths_CI50_low[lines],death_model_high50=model_deaths_CI50_high[lines])
 
-    cases_graphs[[i]] <- ggplot(data=df) + theme_bw()+labs(title=substr(region,1,5))
+    cases_graphs[[i]] <- ggplot(data=df) + theme_bw()+labs(title=region)
     cases_graphs[[i]] <- cases_graphs[[i]]+geom_ribbon(data=df,aes(x=years,ymin=case_model_low95,
                                                                    ymax=case_model_high95),fill="red",alpha=0.5)
     if(data_type=="multi"){
@@ -482,7 +482,7 @@ case_match_graphs <- function(model_data=list(),obs_case_data=list(),input_data=
                                                  title=element_text(size=text_size))
 
 
-    deaths_graphs[[i]] <- ggplot(data=df) + theme_bw()+labs(title=substr(region,1,5))
+    deaths_graphs[[i]] <- ggplot(data=df) + theme_bw()+labs(title=region)
     deaths_graphs[[i]] <- deaths_graphs[[i]]+geom_ribbon(data=df,aes(x=years,ymin=death_model_low95,
                                                                      ymax=death_model_high95),fill="red",alpha=0.5)
     if(data_type=="multi"){
