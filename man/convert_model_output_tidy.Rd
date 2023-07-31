@@ -11,9 +11,9 @@ convert_model_output_tidy(model_output = list())
 '}
 }
 \description{
-Convert output of Full_Model_Run() or Basic_Model_Run() functions to simple line list
+Convert output of Model_Run() and similar functions to simple line list
 }
 \details{
-Takes in the output of the Full_Model_Run() or Basic_Model_Run() functions and outputs a data frame
+Takes in the output of the Model_Run() and similar functions and outputs a data frame
 with one set of SEIRV data per line, for use with tidyr functions
 }

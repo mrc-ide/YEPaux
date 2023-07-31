@@ -14,7 +14,7 @@ plot_model_output(model_output = list())
 Plot outputs of SEIRV model combined across age groups
 }
 \details{
-Takes in SEIRV output from Full_Model_Run(), Basic_Model_Run() and similar functions and outputs a ggplot
+Takes in SEIRV output from Model_Run() and similar and outputs a ggplot
   graph of S, R and V summed over all age groups, with error bars showing the spread of values from multiple
   particles. If data for a single particle is selected, E and I values are also shown.
 }

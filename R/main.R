@@ -55,7 +55,7 @@ convert_model_output_combine_by_age <- function(model_output=list()){
 #'
 #' @description Plot outputs of SEIRV model combined across age groups
 #'
-#' @details Takes in SEIRV output from Full_Model_Run(), Basic_Model_Run() and similar functions and outputs a ggplot
+#' @details Takes in SEIRV output from Model_Run() and similar and outputs a ggplot
 #'   graph of S, R and V summed over all age groups, with error bars showing the spread of values from multiple
 #'   particles. If data for a single particle is selected, E and I values are also shown.
 #'
@@ -118,9 +118,9 @@ plot_model_output <- function(model_output=list()){
 #-------------------------------------------------------------------------------
 #' @title convert_model_output_tidy
 #'
-#' @description Convert output of Full_Model_Run() or Basic_Model_Run() functions to simple line list
+#' @description Convert output of Model_Run() and similar functions to simple line list
 #'
-#' @details Takes in the output of the Full_Model_Run() or Basic_Model_Run() functions and outputs a data frame
+#' @details Takes in the output of the Model_Run() and similar functions and outputs a data frame
 #' with one set of SEIRV data per line, for use with tidyr functions
 #'
 #' @param model_output List of output data produced by appropriate functions
