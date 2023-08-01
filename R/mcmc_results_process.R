@@ -123,6 +123,12 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
                 msg="Regions in environmental data must be in alphabetical order")
     n_env_vars=ncol(enviro_data)-1
     env_vars=colnames(enviro_data)[c(2:(n_env_vars+1))]
+    
+    assert_that(all(colnames(input_frame)[1+c(1:n_env_vars)]==paste("FOI_",env_vars,sep="")),
+                msg="Environmental covariates in environmental data and input frame must match")
+    if(type=="FOI+R0 enviro"){assert_that(all(colnames(input_frame)[1+n_env_vars+c(1:n_env_vars)]==paste("R0_",env_vars,sep="")),
+                                          msg="Environmental covariates in environmental data and input frame must match")}
+    
     regions=enviro_data$region
     n_regions=length(regions)
   } else {
