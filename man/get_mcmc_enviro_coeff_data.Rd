@@ -4,21 +4,13 @@
 \alias{get_mcmc_enviro_coeff_data}
 \title{get_mcmc_enviro_coeff_data}
 \usage{
-get_mcmc_enviro_coeff_data(
-  input_frame = list(),
-  type = "FOI+R0",
-  enviro_data = list()
-)
+get_mcmc_enviro_coeff_data(input_frame = list(), type = "FOI+R0 enviro")
 }
 \arguments{
 \item{input_frame}{Data frame of MCMC output data}
 
-\item{type}{Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-covariates); choose from "FOI enviro","FOI+R0 enviro"}
-
-\item{enviro_data}{Data frame of environmental covariate values used to calculate FOI and R0 in MCMC run, by region
-  (NOTE: the data frame should include only the relevant environmental covariates; any not used in the MCMC fit
-   should be removed)
+\item{type}{Type of parameter set (FOI and/or R0 coefficients associated with environmental
+  covariates); choose from "FOI enviro","FOI+R0 enviro"
 '}
 }
 \description{
@@ -26,6 +18,6 @@ Extract values of environmental coefficients from MCMC output data
 }
 \details{
 This function takes in a data frame produced by functions get_mcmc_data() and/or truncate_mcmc_data() and
-calculates spillover force of infection (FOI) and reproduction number (R0) values for each row in the frame
+calculates values of the coefficients of environmental covariates for each row in the frame
 (representing points on the chain) based on the type of fit carried out.
 }
