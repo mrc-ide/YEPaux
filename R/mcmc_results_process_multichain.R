@@ -222,3 +222,5 @@ get_mcmc_probs_multichain <- function(datasets=c(),datasets_selected=c(1),burnin
 
   return(outputs)
 }
+#-------------------------------------------------------------------------------
+# TODO - Add function for combining chain output data into one data frame
