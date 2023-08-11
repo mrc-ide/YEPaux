@@ -110,7 +110,7 @@ truncate_mcmc_data <- function(input_frame=list(),rows=c(1),plot_graph=TRUE){
 #' @export
 #'
 get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=list()){
-  assert_that(is.data.frame((input_frame)))
+  assert_that(is.data.frame(input_frame))
   assert_that(type %in% c("FOI","FOI+R0","FOI enviro","FOI+R0 enviro"))
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
@@ -169,6 +169,8 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
     }
   }
 
+  #TODO - Put region names in?
+
   return(output_frame)
 }
 #-------------------------------------------------------------------------------
@@ -215,6 +217,3 @@ get_mcmc_enviro_coeff_data <- function(input_frame=list(),type="FOI+R0 enviro"){
 
   return(output_frame)
 }
-#-------------------------------------------------------------------------------
-#TODO - Add additional function(s) to get parameters of distribution of parameter sets,
-#including ordering parameter sets based on global burden results
