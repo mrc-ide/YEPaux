@@ -143,7 +143,7 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
 
   n_lines=nrow(input_frame)
   blank=rep(NA,n_regions*n_lines)
-  output_frame=data.frame(n_region=as.factor(rep(c(1:n_regions),n_lines)),FOI=blank)
+  output_frame=data.frame(n_region=as.factor(rep(c(1:n_regions),n_lines)),region=rep(regions,n_lines),FOI=blank)
   if(type %in% c("FOI+R0","FOI+R0 enviro")){
     R0=blank
     output_frame=cbind(output_frame,R0)}
