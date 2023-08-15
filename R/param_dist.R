@@ -19,20 +19,26 @@
 get_FOI_R0_dist_data <- function(FOI_R0_values=list()){
   assert_that(is.data.frame(FOI_R0_values))
   assert_that(colnames(FOI_R0_values)[1]=="n_region")
-  assert_that(colnames(FOI_R0_values)[2]=="FOI")
-  if(length(colnames(FOI_R0_values))==2){
+  assert_that(colnames(FOI_R0_values)[2]=="region")
+  assert_that(colnames(FOI_R0_values)[3]=="FOI")
+  if(length(colnames(FOI_R0_values))==3){
     flag_R0=0
   } else {
     flag_R0=1
   }
 
-  n_regions=length(unique(FOI_R0_values$n_region))
+  regions=unique(FOI_R0_values$region)
+  n_regions=length(regions)
+  assert_that(all(FOI_R0_values$region[c(1:n_regions)]==regions))
   n_entries=nrow(FOI_R0_values)/n_regions
   bl=rep(NA,n_regions)
-  FOI_R0_summary=data.frame(n_region=c(1:n_regions),FOI_025=bl,FOI_25=bl,FOI_50=bl,FOI_75=bl,FOI_975=bl,FOI_mean=bl,FOI_cv=bl)
-  if(flag_R0==1){
-    FOI_R0_summary$R0_025=FOI_R0_summary$R0_25=FOI_R0_summary$R0_50=FOI_R0_summary$R0_75=
-      FOI_R0_summary$R0_975=FOI_R0_summary$R0_mean=FOI_R0_summary$R0_cv=bl
+  if(flag_R0==0){
+    FOI_R0_summary=data.frame(n_region=c(1:n_regions),region=regions,
+                              FOI_025=bl,FOI_25=bl,FOI_50=bl,FOI_75=bl,FOI_975=bl,FOI_mean=bl,FOI_cv=bl)
+  } else {
+    FOI_R0_summary=data.frame(n_region=c(1:n_regions),region=regions,
+                              FOI_025=bl,FOI_25=bl,FOI_50=bl,FOI_75=bl,FOI_975=bl,FOI_mean=bl,FOI_cv=bl,
+                              R0_025=bl,R0_25=bl,R0_50=bl,R0_75=bl,R0_975=bl,R0_mean=bl,R0_cv=bl)
   }
   n_025=ceiling(n_entries*0.025)
   n_25=ceiling(n_entries*0.25)
