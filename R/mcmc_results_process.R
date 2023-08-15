@@ -70,7 +70,8 @@ get_mcmc_data <- function(input_folder="",plot_graph=TRUE){
 #' to obtain a selection of points along part of the chain. A graph of the posterior likelihood values in the
 #' truncated data frame can optionally be plotted.
 #'
-#' @param input_frame Data frame of output data
+#' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
+#'   combine_multichain()
 #' @param rows Vector of line numbers to extract from input_frame
 #' @param plot_graph TRUE/FALSE flag indicating whether to plot results graph
 #' '
@@ -96,11 +97,12 @@ truncate_mcmc_data <- function(input_frame=list(),rows=c(1),plot_graph=TRUE){
 #'
 #' @description Extract spillover force of infection (FOI) and reproduction number (R0) values from MCMC output data
 #'
-#' @details This function takes in a data frame produced by functions get_mcmc_data() and/or truncate_mcmc_data() and
-#' calculates spillover force of infection (FOI) and reproduction number (R0) values for each row in the frame
-#' (representing points on the chain) based on the type of fit carried out.
+#' @details This function takes in a data frame produced by functions get_mcmc_data(), truncate_mcmc_data() and/or
+#' combine_multichain() and calculates spillover force of infection (FOI) and reproduction number (R0) values for
+#' each row in the frame (representing points on the chain) based on the type of fit carried out.
 #'
-#' @param input_frame Data frame of MCMC output data
+#' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
+#'   combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings
 #' @param type Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
 #'   covariates); choose from "FOI","FOI+R0","FOI enviro","FOI+R0 enviro"
 #' @param enviro_data Data frame of environmental covariate values used to calculate FOI and R0 in MCMC run, by region
@@ -114,7 +116,7 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
   assert_that(type %in% c("FOI","FOI+R0","FOI enviro","FOI+R0 enviro"))
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
-    param_names=colnames(input_frame)[c(2:ncol(input_frame))]}
+    param_names=colnames(input_frame)}
   columns=which(colnames(input_frame) %in% param_names)
 
   if(type %in% c("FOI enviro","FOI+R0 enviro")){
@@ -124,9 +126,9 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
     n_env_vars=ncol(enviro_data)-1
     env_vars=colnames(enviro_data)[c(2:(n_env_vars+1))]
 
-    assert_that(all(colnames(input_frame)[1+c(1:n_env_vars)]==paste("FOI_",env_vars,sep="")),
+    assert_that(all(param_names[c(1:n_env_vars)]==paste("FOI_",env_vars,sep="")),
                 msg="Environmental covariates in environmental data and input frame must match")
-    if(type=="FOI+R0 enviro"){assert_that(all(colnames(input_frame)[1+n_env_vars+c(1:n_env_vars)]==paste("R0_",env_vars,sep="")),
+    if(type=="FOI+R0 enviro"){assert_that(all(param_names[n_env_vars+c(1:n_env_vars)]==paste("R0_",env_vars,sep="")),
                                           msg="Environmental covariates in environmental data and input frame must match")}
 
     regions=enviro_data$region
@@ -182,7 +184,8 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
 #' calculates values of the coefficients of environmental covariates for each row in the frame
 #' (representing points on the chain) based on the type of fit carried out.
 #'
-#' @param input_frame Data frame of MCMC output data
+#' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
+#'   combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings
 #' @param type Type of parameter set (FOI and/or R0 coefficients associated with environmental
 #'   covariates); choose from "FOI enviro","FOI+R0 enviro"
 #' '
@@ -193,7 +196,7 @@ get_mcmc_enviro_coeff_data <- function(input_frame=list(),type="FOI+R0 enviro"){
   assert_that(type %in% c("FOI enviro","FOI+R0 enviro"))
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
-    param_names=colnames(input_frame)[c(2:ncol(input_frame))]}
+    param_names=colnames(input_frame)}
   columns=which(colnames(input_frame) %in% param_names)
 
   columns_FOI_coeffs=which(substr(colnames(input_frame),1,3)=="FOI")

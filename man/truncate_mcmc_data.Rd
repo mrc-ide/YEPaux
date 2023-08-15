@@ -7,7 +7,8 @@
 truncate_mcmc_data(input_frame = list(), rows = c(1), plot_graph = TRUE)
 }
 \arguments{
-\item{input_frame}{Data frame of output data}
+\item{input_frame}{Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
+combine_multichain()}
 
 \item{rows}{Vector of line numbers to extract from input_frame}
 

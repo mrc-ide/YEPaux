@@ -12,8 +12,13 @@ get_FOI_R0_dist_data(FOI_R0_values = list())
 '}
 }
 \description{
-[TBA]
+Obtain parameters of distribution of spillover FOI and/or R0 values
+  obtained for multiple regions using get_mcmc_FOI_R0_data()
 }
 \details{
-[TBA]
+Take output of get_mcmc_FOI_R0_data() (data frame of all spillover FOI and/or
+  R0 values obtained from MCMC results for multiple regions) and obtain information
+  on the distribution of values for each region, including mean, coefficient of variation,
+  median and quartiles of 95% and 50% critical intervals (values below which 2.5%, 25%, 75% and
+  97.5% of values lie).
 }
