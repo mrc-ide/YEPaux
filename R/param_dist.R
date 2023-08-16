@@ -72,6 +72,41 @@ get_FOI_R0_dist_data <- function(FOI_R0_values=list()){
   return(FOI_R0_summary)
 }
 #-------------------------------------------------------------------------------
+#' @title mcmc_R0_value_probs
+#'
+#' @description Get sets of values by region of probability that R0 equals or exceeds one or more values
+#'
+#' @details [TBA]
+#'
+#' @param FOI_R0_values Data frame of spillover FOI and/or R0 values obtained for multiple
+#'   regions using get_mcmc_FOI_R0_data()
+#' @param R0_target_values Vector of target values of R0
+#' '
+#' @export
+#'
+mcmc_R0_value_probs <- function(FOI_R0_values=list(),R0_target_values=c(1.0)){
+
+  regions=unique(FOI_R0_values$region)
+  n_regions=length(regions)
+  n_entries=length(FOI_R0_values$region)/n_regions
+
+  n_values=length(R0_target_values)
+  R0_probs=data.frame(region=regions)
+  for(i in 1:n_values){
+    R0_probs[,i+1]=rep(NA,n_regions)
+    colnames(R0_probs)[i+1]=paste0("P(R0>",R0_target_values[i],")")
+  }
+  for(n_region in 1:n_regions){
+    lines=n_region+((c(1:n_entries)-1)*n_regions)
+    R0_values=FOI_R0_values$R0[lines]
+    for(i in 1:n_values){
+      R0_probs[n_region,i+1]=sum(R0_values>=R0_target_values[i])/n_entries
+    }
+  }
+
+  return(R0_probs)
+}
+#-------------------------------------------------------------------------------
 # TODO - Add function for doing global burden calculations (or similar) based on
 # multiple parameter sets and finding which sets give median, quartile etc. output
 #-------------------------------------------------------------------------------
