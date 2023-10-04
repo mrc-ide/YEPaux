@@ -4,11 +4,16 @@
 \alias{get_FOI_R0_dist_data}
 \title{get_FOI_R0_dist_data}
 \usage{
-get_FOI_R0_dist_data(FOI_R0_values = list())
+get_FOI_R0_dist_data(FOI_R0_values = list(), sorting_metric_values = NULL)
 }
 \arguments{
 \item{FOI_R0_values}{Data frame of spillover FOI and/or R0 values obtained for multiple
-  regions using get_mcmc_FOI_R0_data()
+regions using get_mcmc_FOI_R0_data()}
+
+\item{sorting_metric_values}{Vector of values of a metric associated with parameter sets used to generate FOI_R0_values
+  (e.g. total number of deaths calculated across yellow fever-endemic countries when the relevant parameters are
+  used to calculate burden), used to sort values for each region; if set to NULL, values are simply sorted from lowest
+  to highest
 '}
 }
 \description{

@@ -13,10 +13,14 @@
 #'
 #' @param FOI_R0_values Data frame of spillover FOI and/or R0 values obtained for multiple
 #'   regions using get_mcmc_FOI_R0_data()
+#' @param sorting_metric_values Vector of values of a metric associated with parameter sets used to generate FOI_R0_values
+#'   (e.g. total number of deaths calculated across yellow fever-endemic countries when the relevant parameters are
+#'   used to calculate burden), used to sort values for each region; if set to NULL, values are simply sorted from lowest
+#'   to highest
 #' '
 #' @export
 #'
-get_FOI_R0_dist_data <- function(FOI_R0_values=list()){
+get_FOI_R0_dist_data <- function(FOI_R0_values = list(), sorting_metric_values = NULL){
   assert_that(is.data.frame(FOI_R0_values))
   assert_that(colnames(FOI_R0_values)[1]=="n_region")
   assert_that(colnames(FOI_R0_values)[2]=="region")
@@ -31,6 +35,11 @@ get_FOI_R0_dist_data <- function(FOI_R0_values=list()){
   n_regions=length(regions)
   assert_that(all(FOI_R0_values$region[c(1:n_regions)]==regions))
   n_entries=nrow(FOI_R0_values)/n_regions
+  if(is.null(sorting_metric_values)==FALSE){
+    assert_that(length(sorting_metric_values)==n_entries)
+    sort_order=order(sorting_metric_values)
+  }
+
   bl=rep(NA,n_regions)
   if(flag_R0==0){
     FOI_R0_summary=data.frame(n_region=c(1:n_regions),region=regions,
@@ -47,8 +56,13 @@ get_FOI_R0_dist_data <- function(FOI_R0_values=list()){
 
   for(i in 1:n_regions){
     lines=i+(n_regions*c(0:(n_entries-1)))
-    FOI_values=sort(FOI_R0_values$FOI[lines])
-    R0_values=sort(FOI_R0_values$R0[lines])
+    if(is.null(sorting_metric_values)==FALSE){
+      FOI_values=FOI_R0_values$FOI[lines][sort_order]
+      R0_values=FOI_R0_values$R0[lines][sort_order]
+    } else {
+      FOI_values=sort(FOI_R0_values$FOI[lines])
+      R0_values=sort(FOI_R0_values$R0[lines])
+    }
     FOI_R0_summary$FOI_025[i]=FOI_values[n_025]
     FOI_R0_summary$FOI_25[i]=FOI_values[n_25]
     FOI_R0_summary$FOI_50[i]=median(FOI_values)
@@ -71,6 +85,8 @@ get_FOI_R0_dist_data <- function(FOI_R0_values=list()){
 
   return(FOI_R0_summary)
 }
+#-------------------------------------------------------------------------------
+# TODO - Add function or expand above function to calculate metric values as well as sorting parameter sets
 #-------------------------------------------------------------------------------
 #' @title mcmc_R0_value_probs
 #'
@@ -105,24 +121,4 @@ mcmc_R0_value_probs <- function(FOI_R0_values=list(),R0_target_values=c(1.0)){
   }
 
   return(R0_probs)
-}
-#-------------------------------------------------------------------------------
-# TODO - Add function for doing global burden calculations (or similar) based on
-# multiple parameter sets and finding which sets give median, quartile etc. output
-#-------------------------------------------------------------------------------
-#' @title mcmc_datasets_sort_by_burden
-#'
-#' @description [TBA]
-#'
-#' @details [TBA]
-#'
-#' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
-#'   combine_multichain()
-#' '
-#' @export
-#'
-mcmc_datasets_sort_by_burden <- function(input_frame = list()){
-
-
-  return(NULL)
 }
