@@ -198,6 +198,7 @@ get_mcmc_enviro_coeff_data <- function(input_frame=list(),type="FOI+R0 enviro"){
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
     param_names=colnames(input_frame)}
+  param_names=param_names[param_names != "posterior_current"]
   columns=which(colnames(input_frame) %in% param_names)
 
   columns_FOI_coeffs=which(substr(colnames(input_frame),1,3)=="FOI")
