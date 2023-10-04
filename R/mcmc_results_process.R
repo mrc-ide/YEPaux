@@ -117,6 +117,7 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
     param_names=colnames(input_frame)}
+  param_names=param_names[param_names != "posterior_current"]
   columns=which(colnames(input_frame) %in% param_names)
 
   if(type %in% c("FOI enviro","FOI+R0 enviro")){
