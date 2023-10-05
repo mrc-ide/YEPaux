@@ -144,7 +144,6 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
             col=0,xlab="",ylab="",axes=display_axes,frame.plot=display_axes)
     for(n_region in 1:n_regions){
       plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border="grey",add=TRUE)
-      cat("\n",colour_scale2[scale_values[n_region]])
     }
     legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,ncol=legend_columns)
     title(main=map_title,cex=text_size)
