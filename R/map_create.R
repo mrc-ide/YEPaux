@@ -119,7 +119,6 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   values=ratio*c(1:length(colour_scale))[c(1:n_intervals)]
   for(i in 1:n_intervals){values[i]=max(1,floor(values[i]))}
   colour_scale2 <- colour_scale[values]
-  colour_scale3 <- colour_scale2[c(1:max(scale_values))]
 
   #Create legend labels
   legend_labels=rep("",n_intervals)
