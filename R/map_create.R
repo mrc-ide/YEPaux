@@ -107,32 +107,32 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
 
   #Assign parameter values within scale
   assert_that(min(param_values)>=min(scale))
-  assert_that(max(param_values)<=max(scale))
+  assert_that(max(param_values)<max(scale))
   scale_values=rep(NA,length(param_values))
   for(i in 1:length(param_values)){
     scale_values[i]=findInterval(param_values[i],scale)
   }
 
   #Set colours
-  n_scale_values=length(scale)
-  ratio=length(colour_scale)/n_scale_values
-  values=ratio*c(1:length(colour_scale))[c(1:n_scale_values)]
-  for(i in 1:n_scale_values){values[i]=max(1,floor(values[i]))}
-  colour_scale <- colour_scale[values]
+  n_intervals=length(scale)-1
+  ratio=length(colour_scale)/n_intervals
+  values=ratio*c(1:length(colour_scale))[c(1:n_intervals)]
+  for(i in 1:n_intervals){values[i]=max(1,floor(values[i]))}
+  colour_scale2 <- colour_scale[values]
+  colour_scale3 <- colour_scale2[c(1:max(scale_values))]
 
   #Create legend labels
-  legend_labels=rep("",n_scale_values-1)
+  legend_labels=rep("",n_intervals)
   if(legend_format=="pc"){
-    for(i in 1:(n_scale_values-1)){legend_labels[i]=paste(formatC(scale[i]*100,format="f",digits=legend_dp)," - ",
+    for(i in 1:n_intervals){legend_labels[i]=paste(formatC(scale[i]*100,format="f",digits=legend_dp)," - ",
                                                           formatC(scale[i+1]*100,format="f",digits=legend_dp),sep="")}
-
   }
   if(legend_format=="f"){
-    for(i in 1:(n_scale_values-1)){legend_labels[i]=paste(formatC(scale[i],format="f",digits=legend_dp)," - ",
+    for(i in 1:n_intervals){legend_labels[i]=paste(formatC(scale[i],format="f",digits=legend_dp)," - ",
                                                           formatC(scale[i+1],format="f",digits=legend_dp),sep="")}
   }
   if(legend_format=="e"){
-    for(i in 1:(n_scale_values-1)){legend_labels[i]=paste(formatC(scale[i],format="e",digits=legend_dp)," - ",
+    for(i in 1:n_intervals){legend_labels[i]=paste(formatC(scale[i],format="e",digits=legend_dp)," - ",
                                                           formatC(scale[i+1],format="e",digits=legend_dp),sep="")}
   }
 
@@ -143,9 +143,10 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
     matplot(x=c(shape_data$long_min,shape_data$long_max),y=c(shape_data$lat_min,shape_data$lat_max),
             col=0,xlab="",ylab="",axes=display_axes,frame.plot=display_axes)
     for(n_region in 1:n_regions){
-      plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale[scale_values[n_region]],border="grey",add=TRUE)
+      plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border="grey",add=TRUE)
+      cat("\n",colour_scale2[scale_values[n_region]])
     }
-    legend(legend_position,legend=legend_labels,fill=colour_scale,cex=text_size,title=legend_title,ncol=legend_columns)
+    legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,ncol=legend_columns)
     title(main=map_title,cex=text_size)
   }
   if(is.null(output_file)==FALSE){dev.off()}
