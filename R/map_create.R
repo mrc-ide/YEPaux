@@ -107,7 +107,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
 
   #Assign parameter values within scale
   assert_that(min(param_values)>=min(scale))
-  assert_that(max(param_values)<max(scale))
+  assert_that(max(param_values)<=max(scale))
   scale_values=rep(NA,length(param_values))
   for(i in 1:length(param_values)){
     scale_values[i]=findInterval(param_values[i],scale)

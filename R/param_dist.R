@@ -110,7 +110,7 @@ mcmc_R0_value_probs <- function(FOI_R0_values=list(),R0_target_values=c(1.0)){
   R0_probs=data.frame(region=regions)
   for(i in 1:n_values){
     R0_probs[,i+1]=rep(NA,n_regions)
-    colnames(R0_probs)[i+1]=paste0("P(R0>",R0_target_values[i],")")
+    colnames(R0_probs)[i+1]=paste0("P(R0>=",R0_target_values[i],")")
   }
   for(n_region in 1:n_regions){
     lines=n_region+((c(1:n_entries)-1)*n_regions)
