@@ -8,15 +8,53 @@ t_infectious <- 5 #Time cases remain infectious
 # The following commands ensure that package dependencies are listed in the NAMESPACE file.
 #' @importFrom assertthat assert_that
 #' @importFrom coda gelman.diag gelman.plot mcmc mcmc.list
-#' @importFrom ggplot2 aes element_blank element_text geom_boxplot geom_errorbar geom_line geom_point geom_ribbon geom_violin ggplot labs
+#' @importFrom ggplot2 aes element_blank element_text geom_boxplot geom_errorbar geom_line
+#' @importFrom ggplot2 geom_point geom_ribbon geom_violin ggplot labs
 #' @importFrom ggplot2 scale_x_continuous scale_x_discrete scale_y_continuous theme theme_bw
-#' @importFrom graphics axis legend matplot par title
+#' @importFrom graphics axis image legend matplot par title
 #' @importFrom grDevices dev.off png
 #' @importFrom Rmisc CI
 #' @importFrom sf read_sf st_bbox st_geometry
 #' @importFrom stats cov dexp dnbinom dnorm median prop.test rbinom runif var
 #' @importFrom utils read.csv write.csv
 #' @import YEP
+#-------------------------------------------------------------------------------
+#' @title plot_region_input_data
+#'
+#' @description TBA
+#'
+#' @details TBA
+#'
+#' @param input_data Input data list in standard format
+#' @param region Selected region from input_data$region_labels
+#' @param data_type Type of data to plot, either "vacc" or "pop"
+#' @param colour_scale TBA
+#' @param output_filename TBA
+#' @param pixel_width TBA
+#' @param pixel_height TBA
+#' '
+#' @export
+#'
+plot_region_input_data <- function(input_data = list(), region = "", data_type = "vacc", colour_scale = c(),
+                                   output_filename = NULL, pixel_width = 480, pixel_height = 480){
+  assert_that(region %in% input_data$region_labels)
+  assert_that(data_type %in% c("vacc","pop"))
+
+  if(is.null(output_filename)==FALSE){png(output_filename, width = pixel_width, height = pixel_height)}
+  if(data_type=="vacc"){
+    image(x=input_data$years_labels,y=input_data$age_labels,z=input_data$vacc_data[input_data$region_labels==region,,],
+          zlim=c(0,1),xlab="Year",ylab="Age",col = colour_scale)
+    title(main=paste(region,"- calculated vaccination immunity by date + age"))
+  } else {
+    pop_matrix=input_data$pop_data[input_data$region_labels==region,,]
+    image(x=input_data$years_labels,y=input_data$age_labels,z=pop_matrix,
+          zlim=c(0,max(pop_matrix)),xlab="Year",ylab="Age",col = colour_scale)
+    title(main=paste(region,"- estimated population by date + age"))
+  }
+  if(is.null(output_filename)==FALSE){dev.off()}
+
+  return(NULL)
+}
 #-------------------------------------------------------------------------------
 #' @title convert_model_output_combine_by_age # TODO - Amend to deal with different outputs
 #'
