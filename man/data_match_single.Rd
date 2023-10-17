@@ -25,7 +25,7 @@ positives}
 deaths}
 
 \item{const_list}{= List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, TBA)}
+vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, TBA) TODO - Make additional parameters flexible}
 }
 \description{
 Function which runs the model to create simulated data corresponding to supplied observed data for a

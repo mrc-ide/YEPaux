@@ -20,7 +20,7 @@
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
 #' @param const_list = List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, TBA)
+#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, TBA) TODO - Make additional parameters flexible
 #'
 #' @export
 #'
@@ -48,40 +48,28 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
 
   frac=1.0/const_list$n_reps
   n_params=length(params)
-  extra_params=c()
-  if(is.null(const_list$vaccine_efficacy)==TRUE){extra_params=append(extra_params,"vaccine_efficacy")}
-  if(is.null(const_list$p_rep_severe)==TRUE){extra_params=append(extra_params,"p_rep_severe")}
-  if(is.null(const_list$p_rep_death)==TRUE){extra_params=append(extra_params,"p_rep_death")}
-  if(is.null(const_list$m_FOI_Brazil)==TRUE){extra_params=append(extra_params,"m_FOI_Brazil")}
-  names(params)=create_param_labels(const_list$type,input_data,const_list$enviro_data,extra_params)
-  mcmc_checks(params,n_regions,const_list$type,params,params,"zero",
-              const_list$enviro_data,const_list$R0_fixed_values,
-              const_list$vaccine_efficacy,const_list$p_rep_severe,const_list$p_rep_death,const_list$m_FOI_Brazil)
+  extra_estimated_params=c()
+  if(is.null(const_list$vaccine_efficacy)==TRUE){extra_estimated_params=append(extra_estimated_params,"vaccine_efficacy")}
+  if(is.null(const_list$p_rep_severe)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_severe")}
+  if(is.null(const_list$p_rep_death)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_death")}
+  if(is.null(const_list$m_FOI_Brazil)==TRUE){extra_estimated_params=append(extra_estimated_params,"m_FOI_Brazil")}
+  names(params)=create_param_labels(const_list$type,input_data,const_list$enviro_data,extra_estimated_params)
 
-  #Get vaccine efficacy
-  if(is.numeric(const_list$vaccine_efficacy)==FALSE){
-    vaccine_efficacy=params[names(params)=="vaccine_efficacy"]
-  } else {
-    vaccine_efficacy=const_list$vaccine_efficacy
-  }
+  mcmc_checks(params,n_regions,const_list$type,list(type="zero"),const_list$enviro_data,const_list$R0_fixed_values,
+              add_values=list(vaccine_efficacy=const_list$vaccine_efficacy,p_rep_severe=const_list$p_rep_severe,
+                              p_rep_death=const_list$p_rep_death,m_FOI_Brazil=const_list$m_FOI_Brazil),
+              extra_estimated_params)
 
-  #Get reporting probabilities
-  if(is.numeric(const_list$p_rep_severe)==FALSE){
-    p_rep_severe=as.numeric(params[names(params)=="p_rep_severe"])
-  } else {
-    p_rep_severe=const_list$p_rep_severe
-  }
-  if(is.numeric(const_list$p_rep_death)==FALSE){
-    p_rep_death=as.numeric(params[names(params)=="p_rep_death"])
-  } else {
-    p_rep_death=const_list$p_rep_death
-  }
-
-  #Get Brazil modifier
-  if(is.numeric(const_list$m_FOI_Brazil)==FALSE){
-    m_FOI_Brazil=as.numeric(params[names(params)=="m_FOI_Brazil"])
-  } else {
-    m_FOI_Brazil=const_list$m_FOI_Brazil
+  #Get additional values - TODO: Make flexible
+  vaccine_efficacy=p_rep_severe=p_rep_death=m_FOI_Brazil=1.0
+  prior_add=0
+  for(var_name in c("vaccine_efficacy","p_rep_severe","p_rep_death","m_FOI_Brazil")){
+    if(is.numeric(const_list[[var_name]])==FALSE){
+      i=match(var_name,names(params))
+      assign(var_name,as.numeric(params[i]))
+    } else {
+      assign(var_name,const_list[[var_name]])
+    }
   }
 
   #Get FOI and R0 values
