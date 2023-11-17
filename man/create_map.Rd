@@ -16,6 +16,9 @@ create_map(
   long_max = NULL,
   long_min = NULL,
   display_axes = FALSE,
+  border_colour_regions = "grey",
+  additional_border_shapes = NULL,
+  border_colour_additional = "",
   map_title = "",
   legend_title = "",
   legend_position = "topleft",
@@ -47,6 +50,13 @@ create_map(
 \item{long_min}{Minimum longitude (set to NULL to default to minimum longitude from shape_data)}
 
 \item{display_axes}{TRUE/FALSE flag indicating whether to frame map and display latitude/longitude axes}
+
+\item{border_colour_regions}{Colour to use for borders of regions. Set to NA if borders to be invisible.}
+
+\item{additional_border_shapes}{Shape data for optional additional borders (e.g. national borders to show in addition to
+subnational region boundaries) generated using map_shapes_load(). Set to NULL if to be unused.}
+
+\item{border_colour_additional}{Colour to use for additional borders if any.}
 
 \item{map_title}{Title to show above map}
 

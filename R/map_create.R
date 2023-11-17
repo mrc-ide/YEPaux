@@ -66,6 +66,10 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 #' @param long_max Minimum longitude (set to NULL to default to minimum longitude from shape_data)
 #' @param long_min Minimum longitude (set to NULL to default to minimum longitude from shape_data)
 #' @param display_axes TRUE/FALSE flag indicating whether to frame map and display latitude/longitude axes
+#' @param border_colour_regions Colour to use for borders of regions. Set to NA if borders to be invisible.
+#' @param additional_border_shapes Shape data for optional additional borders (e.g. national borders to show in addition to
+#'   subnational region boundaries) generated using map_shapes_load(). Set to NULL if to be unused.
+#' @param border_colour_additional Colour to use for additional borders if any.
 #' @param map_title Title to show above map
 #' @param legend_title Title to show above legend
 #' @param legend_position Position to place map legend (select from"bottomright", "bottom", "bottomleft", "left",
@@ -80,7 +84,8 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 #' @export
 #'
 create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale=c(),pixels_max=720,text_size=1,
-                       lat_max=NULL,lat_min=NULL,long_max=NULL,long_min=NULL,display_axes=FALSE,map_title="",
+                       lat_max=NULL,lat_min=NULL,long_max=NULL,long_min=NULL,display_axes=FALSE,
+                       border_colour_regions="grey",additional_border_shapes=NULL,border_colour_additional="",map_title="",
                        legend_title="",legend_position="topleft",legend_format="f",legend_dp=1,legend_columns=1,
                        output_file=NULL){
 
@@ -93,6 +98,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   assert_that(legend_format %in% c("f","e","dp"))
   n_regions=length(param_values)
   assert_that(n_regions==length(shape_data$shapes))
+  n_shapes_additional=length(additional_border_shapes$shapes)
 
   #Set map dimensions
   if(is.null(lat_max)){lat_max=shape_data$lat_max}
@@ -142,7 +148,11 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
     matplot(x=c(shape_data$long_min,shape_data$long_max),y=c(shape_data$lat_min,shape_data$lat_max),
             col=0,xlab="",ylab="",axes=display_axes,frame.plot=display_axes)
     for(n_region in 1:n_regions){
-      plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border="grey",add=TRUE)
+      plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
+           add=TRUE)
+    }
+    for(j in 1:n_shapes_additional){
+      plot(st_geometry(additional_border_shapes$shapes[[j]]),col=NA,border=border_colour_additional,add=TRUE)
     }
     legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,ncol=legend_columns)
     title(main=map_title,cex=text_size)
