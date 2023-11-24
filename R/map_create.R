@@ -145,8 +145,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   par(mar=c(1,1,1,1))
   if(is.null(output_file)==FALSE){png(filename=output_file,width=width_px,height=height_px)}
   {
-    matplot(x=c(long_min,long_max),y=c(lat_min,lat_max),
-            col=0,xlab="",ylab="",axes=display_axes,frame.plot=display_axes)
+    matplot(x=c(long_min,long_max),y=c(lat_min,lat_max),col=0,xlab="",ylab="",axes=display_axes,frame.plot=display_axes)
     for(n_region in 1:n_regions){
       plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
            add=TRUE)
