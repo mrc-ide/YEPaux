@@ -84,7 +84,7 @@ display_multichain_progress <- function(datasets=list(),datasets_selected=c(1),b
   title_text="Chains:"
   for(i in 1:length(datasets_selected)){title_text=paste(title_text,datasets_selected[i],sep=" ")}
   title_text=paste(title_text," - MPSRF = ",MPSRF,sep="")
-  matplot(x=c(1,max(end_values)),y=c(like_min,like_max),type="p",col=0,xlab="Iteration",ylab="LogLikelihood")
+  matplot(x=c(1,max(end_values)),y=c(like_min,like_max),type="p",col=0,xlab="Iteration",ylab="Log posterior probability")
   for(i in 1:length(datasets_selected)){
     n_data=datasets_selected[i]
     matplot(x=rows[[i]],y=like_values[[n_data]],type="l",col=n_data,add=TRUE)
