@@ -150,8 +150,10 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
       plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
            add=TRUE)
     }
-    for(j in 1:n_shapes_additional){
-      plot(st_geometry(additional_border_shapes$shapes[[j]]),col=NA,border=border_colour_additional,add=TRUE)
+    if(is.null(additional_border_shapes)==FALSE){
+      for(j in 1:n_shapes_additional){
+        plot(st_geometry(additional_border_shapes$shapes[[j]]),col=NA,border=border_colour_additional,add=TRUE)
+      }
     }
     legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,ncol=legend_columns)
     title(main=map_title,cex=text_size)
