@@ -5,3 +5,10 @@ A package to be used in conjunction with the [YEP (Yellow Fever Epidemic Prevent
   <!-- badges: start -->
   [![R-CMD-check](https://github.com/mrc-ide/YFD_aux/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mrc-ide/YEP/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
+
+## Installation
+
+```
+#install.packages("devtools")
+devtools::install_github("YEPaux")
+```
