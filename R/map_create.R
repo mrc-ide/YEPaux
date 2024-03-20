@@ -73,9 +73,9 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 #' @param map_title Title to show above map
 #' @param legend_title Title to show above legend
 #' @param legend_position Position to place map legend (select from"bottomright", "bottom", "bottomleft", "left",
-#'   "topleft", "top", "topright", "right" and "center")
+#'   "topleft", "top", "topright", "right" and "center" or set to NULL to omit legend)
 #' @param legend_format Number format to use for scale values in legend - set to "f" (basic number), "e" (scientific
-#'   notation) or "pc" (percentage)
+#'   notation), "pc" (percentage) or "integer" (for integer inputs where colours represent values rather than ranges)
 #' @param legend_dp Number of decimal places to use in scale values in legend (e.g. if legend_format is "f" and
 #'   legend_dp is 1, numbers will appear as e.g. 10.0)
 #' @param legend_columns Number of columns in which to display legend values
@@ -94,8 +94,9 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   assert_that(is.numeric(scale))
   assert_that(is.logical(display_axes))
   assert_that(legend_position %in% c("bottomright","bottom","bottomleft","left",
-                                     "topleft","top","topright","right","center"))
-  assert_that(legend_format %in% c("f","e","dp"))
+                                     "topleft","top","topright","right","center",NULL))
+  assert_that(legend_format %in% c("f","e","pc","integer"))
+  if(legend_format=="integer"){assert_that(is.integer(param_values) && is.integer(scale))}
   n_regions=length(param_values)
   assert_that(n_regions==length(shape_data$shapes))
   n_shapes_additional=length(additional_border_shapes$shapes)
@@ -120,25 +121,32 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   }
 
   #Set colours
-  n_intervals=length(scale)-1
+  if(legend_format=="integer"){n_intervals=length(scale)} else {n_intervals=length(scale)-1}
   ratio=length(colour_scale)/n_intervals
   values=ratio*c(1:length(colour_scale))[c(1:n_intervals)]
   for(i in 1:n_intervals){values[i]=max(1,floor(values[i]))}
   colour_scale2 <- colour_scale[values]
 
   #Create legend labels
-  legend_labels=rep("",n_intervals)
-  if(legend_format=="pc"){
-    for(i in 1:n_intervals){legend_labels[i]=paste(formatC(scale[i]*100,format="f",digits=legend_dp)," - ",
-                                                          formatC(scale[i+1]*100,format="f",digits=legend_dp),sep="")}
-  }
-  if(legend_format=="f"){
-    for(i in 1:n_intervals){legend_labels[i]=paste(formatC(scale[i],format="f",digits=legend_dp)," - ",
-                                                          formatC(scale[i+1],format="f",digits=legend_dp),sep="")}
-  }
-  if(legend_format=="e"){
-    for(i in 1:n_intervals){legend_labels[i]=paste(formatC(scale[i],format="e",digits=legend_dp)," - ",
-                                                          formatC(scale[i+1],format="e",digits=legend_dp),sep="")}
+  if(is.null(legend_position)==FALSE){
+    legend_labels=rep("",n_intervals)
+    if(legend_format=="integer"){
+      for(i in 1:n_intervals){
+        legend_labels[i]=paste0(scale[i])
+      }
+    }
+    if(legend_format=="pc"){
+      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i]*100,format="f",digits=legend_dp)," - ",
+                                                     formatC(scale[i+1]*100,format="f",digits=legend_dp))}
+    }
+    if(legend_format=="f"){
+      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i],format="f",digits=legend_dp)," - ",
+                                                     formatC(scale[i+1],format="f",digits=legend_dp))}
+    }
+    if(legend_format=="e"){
+      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i],format="e",digits=legend_dp)," - ",
+                                                     formatC(scale[i+1],format="e",digits=legend_dp))}
+    }
   }
 
   #Create graph
@@ -155,7 +163,10 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
         plot(st_geometry(additional_border_shapes$shapes[[j]]),col=NA,border=border_colour_additional,add=TRUE)
       }
     }
-    legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,ncol=legend_columns)
+    if(is.null(legend_position)==FALSE){
+      legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,
+             ncol=legend_columns)
+    }
     title(main=map_title,cex=text_size)
   }
   if(is.null(output_file)==FALSE){dev.off()}
