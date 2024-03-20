@@ -167,7 +167,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
       legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,
              ncol=legend_columns)
     }
-    title(main=map_title,cex=text_size)
+    title(main=map_title,cex.main=text_size)
   }
   if(is.null(output_file)==FALSE){dev.off()}
   par(mar=c(4,4,4,4))
