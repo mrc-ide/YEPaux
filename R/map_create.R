@@ -73,7 +73,7 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 #' @param map_title Title to show above map
 #' @param legend_title Title to show above legend
 #' @param legend_position Position to place map legend (select from"bottomright", "bottom", "bottomleft", "left",
-#'   "topleft", "top", "topright", "right" and "center" or set to NULL to omit legend)
+#'   "topleft", "top", "topright", "right" and "center" or set to "none" to omit legend)
 #' @param legend_format Number format to use for scale values in legend - set to "f" (basic number), "e" (scientific
 #'   notation), "pc" (percentage) or "integer" (for integer inputs where colours represent values rather than ranges)
 #' @param legend_dp Number of decimal places to use in scale values in legend (e.g. if legend_format is "f" and
@@ -94,7 +94,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   assert_that(is.numeric(scale))
   assert_that(is.logical(display_axes))
   assert_that(legend_position %in% c("bottomright","bottom","bottomleft","left",
-                                     "topleft","top","topright","right","center",NULL))
+                                     "topleft","top","topright","right","center","none"))
   assert_that(legend_format %in% c("f","e","pc","integer"))
   if(legend_format=="integer"){assert_that(is.integer(param_values) && is.integer(scale))}
   n_regions=length(param_values)
@@ -163,7 +163,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
         plot(st_geometry(additional_border_shapes$shapes[[j]]),col=NA,border=border_colour_additional,add=TRUE)
       }
     }
-    if(is.null(legend_position)==FALSE){
+    if(legend_position!="none"){
       legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,
              ncol=legend_columns)
     }

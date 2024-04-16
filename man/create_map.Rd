@@ -63,7 +63,7 @@ subnational region boundaries) generated using map_shapes_load(). Set to NULL if
 \item{legend_title}{Title to show above legend}
 
 \item{legend_position}{Position to place map legend (select from"bottomright", "bottom", "bottomleft", "left",
-"topleft", "top", "topright", "right" and "center" or set to NULL to omit legend)}
+"topleft", "top", "topright", "right" and "center" or set to "none" to omit legend)}
 
 \item{legend_format}{Number format to use for scale values in legend - set to "f" (basic number), "e" (scientific
 notation), "pc" (percentage) or "integer" (for integer inputs where colours represent values rather than ranges)}
