@@ -20,7 +20,9 @@
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
 #' @param const_list = List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, TBA) TODO - Make additional parameters flexible
+#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic, mode_parallel, cluster, p_severe_inf,
+#'   p_death_severe_inf)
+#'   TODO - Make additional parameters flexible
 #'
 #' @export
 #'
@@ -62,7 +64,6 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
 
   #Get additional values - TODO: Make flexible
   vaccine_efficacy=p_rep_severe=p_rep_death=m_FOI_Brazil=1.0
-  prior_add=0
   for(var_name in c("vaccine_efficacy","p_rep_severe","p_rep_death","m_FOI_Brazil")){
     if(is.numeric(const_list[[var_name]])==FALSE){
       i=match(var_name,names(params))
@@ -94,6 +95,8 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
     if(const_list$type=="FOI+R0"){R0_values=params[c((n_regions+1):(2*n_regions))]
     } else {R0_values=const_list$R0_fixed_values}
   }
+
+  if(is.null(const_list$mode_parallel)){const_list$mode_parallel="none"}
 
   #Generate modelled data over all regions
   dataset <- Generate_Dataset(input_data,FOI_values,R0_values,obs_sero_data,obs_case_data,
