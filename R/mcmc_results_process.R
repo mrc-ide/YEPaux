@@ -172,6 +172,9 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
     }
   }
 
+  output_frame$FOI[output_frame$FOI<0.0]=0.0
+  output_frame$R0[output_frame$R0<0.0]=0.0
+
   #TODO - Put region names in?
 
   return(output_frame)
