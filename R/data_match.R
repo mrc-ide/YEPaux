@@ -19,20 +19,21 @@
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param const_list = List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic, mode_parallel, cluster, p_severe_inf,
-#'   p_death_severe_inf)
-#'   TODO - Make additional parameters flexible
+#' @param ... = Constant additional parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,
+#'   R0_fixed_values, vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic,
+#'   mode_parallel, cluster, p_severe_inf,p_death_severe_inf)
 #'
 #' @export
 #'
-data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,obs_case_data=NULL,
-                              const_list=list()) {
+data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,
+                              obs_case_data=NULL,...){
 
   assert_that(all(params>0),msg="All parameter values must be positive")
   assert_that(input_data_check(input_data),
               msg="Input data must be in standard format (see https://mrc-ide.github.io/YEP/articles/CGuideAInputs.html )")
-  assert_that(is.list(const_list)) #TODO - Better checks for const_list
+  const_list<-list(...)
+  assert_that(const_list$type %in% c("FOI","FOI+R0","FOI enviro","FOI+R0 enviro"))
+  #TODO - Add additional assert_that checks?
 
   #Process input data to check that all regions with sero, case and/or outbreak data supplied are present, remove
   #regions without any supplied data, and add cross-referencing tables for use when calculating likelihood. Take
@@ -128,14 +129,13 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param const_list = List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
+#' @param ... = Constant additional parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
 #'   vaccine_efficacy,p_rep_severe,p_rep_death, TBA)
 #'
 #' @export
 #'
-data_match_multi <- function(param_sets=list(),input_data=list(),obs_sero_data=NULL,obs_case_data=NULL,
-                             const_list=list()){
-
+data_match_multi <- function(param_sets=list(),input_data=list(),obs_sero_data=NULL,
+                             obs_case_data=NULL,...){
   assert_that(is.data.frame(param_sets),msg="param_sets must be a data frame")
 
   n_param_sets=nrow(param_sets)
@@ -143,8 +143,8 @@ data_match_multi <- function(param_sets=list(),input_data=list(),obs_sero_data=N
   cat("\nSet:\n")
   for(i in 1:n_param_sets){
     cat("\t",i)
-    params=as.numeric(param_sets[i,])
-    model_data_all[[i]] <- data_match_single(params,input_data,obs_sero_data,obs_case_data,const_list)
+    params=param_sets[i,]
+    model_data_all[[i]] <- data_match_single(params,input_data,obs_sero_data,obs_case_data,...)
   }
 
   return(model_data_all)

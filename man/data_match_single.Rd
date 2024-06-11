@@ -9,7 +9,7 @@ data_match_single(
   input_data = list(),
   obs_sero_data = NULL,
   obs_case_data = NULL,
-  const_list = list()
+  ...
 )
 }
 \arguments{
@@ -24,10 +24,9 @@ positives}
 \item{obs_case_data}{Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 deaths}
 
-\item{const_list}{= List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
-vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic, mode_parallel, cluster, p_severe_inf,
-p_death_severe_inf)
-TODO - Make additional parameters flexible}
+\item{...}{= Constant additional parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,
+R0_fixed_values, vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic,
+mode_parallel, cluster, p_severe_inf,p_death_severe_inf)}
 }
 \description{
 Function which runs the model to create simulated data corresponding to supplied observed data for a

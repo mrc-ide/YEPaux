@@ -9,7 +9,7 @@ data_match_multi(
   input_data = list(),
   obs_sero_data = NULL,
   obs_case_data = NULL,
-  const_list = list()
+  ...
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ positives}
 \item{obs_case_data}{Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 deaths}
 
-\item{const_list}{= List of constant parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
+\item{...}{= Constant additional parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
 vaccine_efficacy,p_rep_severe,p_rep_death, TBA)}
 }
 \description{
