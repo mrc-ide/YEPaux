@@ -61,53 +61,40 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 #' @param colour_scale Vector of colours with size greater than or equal to scale - used to convert scale to colours
 #' @param pixels_max Number of pixels to use for largest dimension of map
 #' @param text_size Size of text to appear in legend and titles
-#' @param lat_max Maximum latitude (set to NULL to default to maximum latitude from shape_data)
-#' @param lat_min Minimum latitude (set to NULL to default to minimum latitude from shape_data)
-#' @param long_max Minimum longitude (set to NULL to default to minimum longitude from shape_data)
-#' @param long_min Minimum longitude (set to NULL to default to minimum longitude from shape_data)
 #' @param display_axes TRUE/FALSE flag indicating whether to frame map and display latitude/longitude axes
 #' @param border_colour_regions Colour to use for borders of regions. Set to NA if borders to be invisible.
-#' @param additional_border_shapes Shape data for optional additional borders (e.g. national borders to show in addition to
-#'   subnational region boundaries) generated using map_shapes_load(). Set to NULL if to be unused.
-#' @param border_colour_additional Colour to use for additional borders if any.
-#' @param map_title Title to show above map
-#' @param legend_title Title to show above legend
-#' @param legend_position Position to place map legend (select from"bottomright", "bottom", "bottomleft", "left",
-#'   "topleft", "top", "topright", "right" and "center" or set to "none" to omit legend)
-#' @param legend_format Number format to use for scale values in legend - set to "f" (basic number), "e" (scientific
-#'   notation), "pc" (percentage) or "integer" (for integer inputs where colours represent values rather than ranges)
-#' @param legend_dp Number of decimal places to use in scale values in legend (e.g. if legend_format is "f" and
-#'   legend_dp is 1, numbers will appear as e.g. 10.0)
-#' @param legend_columns Number of columns in which to display legend values
-#' @param output_file Name of file to which to output map; if set to NULL, map is displayed without being saved to file
+#' @param ... Additional optional parameters:
+#'    lat_max,lat_min,long_max,long_min: borders if not to be set default
+#'    additional_border_shapes: Shape data for optional additional borders
+#'    border_colour_additional: colour to use for additional borders if any.
+#     map_title: Title to show above map
+#     legend_title: Title to show above legend
+#     legend_position: Position to place map legend if to be used
+#     legend_format: Number format to use for scale values in legend if used
+#     legend_dp: Number of decimal places to use in scale values in legend
+#     legend_columns: Number of columns in which to display legend values
+#     output_file: Name of file to which to output map
 #' '
 #' @export
 #'
 create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale=c(),pixels_max=720,text_size=1,
-                       lat_max=NULL,lat_min=NULL,long_max=NULL,long_min=NULL,display_axes=FALSE,
-                       border_colour_regions="grey",additional_border_shapes=NULL,border_colour_additional="",map_title="",
-                       legend_title="",legend_position="topleft",legend_format="f",legend_dp=1,legend_columns=1,
-                       output_file=NULL){
+                       display_axes=FALSE,border_colour_regions="grey",...){
 
   assert_that(is.list(shape_data))
   assert_that(is.numeric(param_values))
   assert_that(is.numeric(scale))
   assert_that(is.logical(display_axes))
-  assert_that(legend_position %in% c("bottomright","bottom","bottomleft","left",
-                                     "topleft","top","topright","right","center","none"))
-  assert_that(legend_format %in% c("f","e","pc","integer"))
-  if(legend_format=="integer"){assert_that(is.integer(param_values) && is.integer(scale))}
   n_regions=length(param_values)
   assert_that(n_regions==length(shape_data$shapes))
-  n_shapes_additional=length(additional_border_shapes$shapes)
+  ap=list(...) #Get additional optional parameters
 
   #Set map dimensions
-  if(is.null(lat_max)){lat_max=shape_data$lat_max}
-  if(is.null(lat_min)){lat_min=shape_data$lat_min}
-  if(is.null(long_max)){long_max=shape_data$long_max}
-  if(is.null(long_min)){long_min=shape_data$long_min}
-  height_ll=lat_max-lat_min
-  width_ll=long_max-long_min
+  if(is.null(ap$lat_max)){ap$lat_max=shape_data$lat_max}
+  if(is.null(ap$lat_min)){ap$lat_min=shape_data$lat_min}
+  if(is.null(ap$long_max)){ap$long_max=shape_data$long_max}
+  if(is.null(ap$long_min)){ap$long_min=shape_data$long_min}
+  height_ll=ap$lat_max-ap$lat_min
+  width_ll=ap$long_max-ap$long_min
   pixel_scale=pixels_max/max(height_ll,width_ll)
   width_px=width_ll*pixel_scale
   height_px=height_ll*pixel_scale
@@ -119,57 +106,64 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   for(i in 1:length(param_values)){
     scale_values[i]=findInterval(param_values[i],scale)
   }
+  if(is.null(ap$legend_format)==FALSE && ap$legend_format=="integer"){n_intervals=length(scale)} else {n_intervals=length(scale)-1}
+
+  #Create legend labels
+  if(is.null(ap$legend_position)==FALSE){
+    assert_that(ap$legend_position %in% c("bottomright","bottom","bottomleft","left","topleft","top","topright","right","center"))
+    assert_that(is.null(ap$legend_format)==FALSE)
+    assert_that(ap$legend_format %in% c("f","e","pc","integer"))
+    if(ap$legend_format=="integer"){assert_that(is.integer(param_values) && is.integer(scale))}
+    legend_labels=rep("",n_intervals)
+    if(ap$legend_format=="integer"){
+      for(i in 1:n_intervals){
+        legend_labels[i]=paste0(scale[i])
+      }
+    }
+    if(ap$legend_format=="pc"){
+      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i]*100,format="f",digits=ap$legend_dp)," - ",
+                                                     formatC(scale[i+1]*100,format="f",digits=ap$legend_dp))}
+    }
+    if(ap$legend_format=="f"){
+      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i],format="f",digits=ap$legend_dp)," - ",
+                                                     formatC(scale[i+1],format="f",digits=ap$legend_dp))}
+    }
+    if(ap$legend_format=="e"){
+      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i],format="e",digits=ap$legend_dp)," - ",
+                                                     formatC(scale[i+1],format="e",digits=ap$legend_dp))}
+    }
+  }
 
   #Set colours
-  if(legend_format=="integer"){n_intervals=length(scale)} else {n_intervals=length(scale)-1}
   ratio=length(colour_scale)/n_intervals
   values=ratio*c(1:length(colour_scale))[c(1:n_intervals)]
   for(i in 1:n_intervals){values[i]=max(1,floor(values[i]))}
   colour_scale2 <- colour_scale[values]
 
-  #Create legend labels
-  if(is.null(legend_position)==FALSE){
-    legend_labels=rep("",n_intervals)
-    if(legend_format=="integer"){
-      for(i in 1:n_intervals){
-        legend_labels[i]=paste0(scale[i])
-      }
-    }
-    if(legend_format=="pc"){
-      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i]*100,format="f",digits=legend_dp)," - ",
-                                                     formatC(scale[i+1]*100,format="f",digits=legend_dp))}
-    }
-    if(legend_format=="f"){
-      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i],format="f",digits=legend_dp)," - ",
-                                                     formatC(scale[i+1],format="f",digits=legend_dp))}
-    }
-    if(legend_format=="e"){
-      for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(scale[i],format="e",digits=legend_dp)," - ",
-                                                     formatC(scale[i+1],format="e",digits=legend_dp))}
-    }
-  }
-
   #Create graph
   par(mar=c(1,1,1,1))
-  if(is.null(output_file)==FALSE){png(filename=output_file,width=width_px,height=height_px)}
+  if(is.null(ap$output_file)==FALSE){png(filename=ap$output_file,width=width_px,height=height_px)}
   {
-    matplot(x=c(long_min,long_max),y=c(lat_min,lat_max),col=0,xlab="",ylab="",axes=display_axes,frame.plot=display_axes)
+    matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
+            axes=display_axes,frame.plot=display_axes)
     for(n_region in 1:n_regions){
       plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
            add=TRUE)
     }
-    if(is.null(additional_border_shapes)==FALSE){
+    if(is.null(ap$additional_border_shapes)==FALSE){
+      n_shapes_additional=length(ap$additional_border_shapes$shapes)
       for(j in 1:n_shapes_additional){
-        plot(st_geometry(additional_border_shapes$shapes[[j]]),col=NA,border=border_colour_additional,add=TRUE)
+        plot(st_geometry(ap$additional_border_shapes$shapes[[j]]),col=NA,border=ap$border_colour_additional,add=TRUE)
       }
     }
-    if(legend_position!="none"){
-      legend(legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=legend_title,
-             ncol=legend_columns)
+    if(is.null(ap$legend_position)==FALSE){
+      if(is.null(ap$legend_columns)){ap$legend_columns=1}
+      legend(ap$legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=ap$legend_title,
+             ncol=ap$legend_columns)
     }
-    title(main=map_title,cex.main=text_size)
+    title(main=ap$map_title,cex.main=text_size)
   }
-  if(is.null(output_file)==FALSE){dev.off()}
+  if(is.null(ap$output_file)==FALSE){dev.off()}
   par(mar=c(4,4,4,4))
 
   return(NULL)

@@ -11,21 +11,9 @@ create_map(
   colour_scale = c(),
   pixels_max = 720,
   text_size = 1,
-  lat_max = NULL,
-  lat_min = NULL,
-  long_max = NULL,
-  long_min = NULL,
   display_axes = FALSE,
   border_colour_regions = "grey",
-  additional_border_shapes = NULL,
-  border_colour_additional = "",
-  map_title = "",
-  legend_title = "",
-  legend_position = "topleft",
-  legend_format = "f",
-  legend_dp = 1,
-  legend_columns = 1,
-  output_file = NULL
+  ...
 )
 }
 \arguments{
@@ -41,39 +29,14 @@ create_map(
 
 \item{text_size}{Size of text to appear in legend and titles}
 
-\item{lat_max}{Maximum latitude (set to NULL to default to maximum latitude from shape_data)}
-
-\item{lat_min}{Minimum latitude (set to NULL to default to minimum latitude from shape_data)}
-
-\item{long_max}{Minimum longitude (set to NULL to default to minimum longitude from shape_data)}
-
-\item{long_min}{Minimum longitude (set to NULL to default to minimum longitude from shape_data)}
-
 \item{display_axes}{TRUE/FALSE flag indicating whether to frame map and display latitude/longitude axes}
 
 \item{border_colour_regions}{Colour to use for borders of regions. Set to NA if borders to be invisible.}
 
-\item{additional_border_shapes}{Shape data for optional additional borders (e.g. national borders to show in addition to
-subnational region boundaries) generated using map_shapes_load(). Set to NULL if to be unused.}
-
-\item{border_colour_additional}{Colour to use for additional borders if any.}
-
-\item{map_title}{Title to show above map}
-
-\item{legend_title}{Title to show above legend}
-
-\item{legend_position}{Position to place map legend (select from"bottomright", "bottom", "bottomleft", "left",
-"topleft", "top", "topright", "right" and "center" or set to "none" to omit legend)}
-
-\item{legend_format}{Number format to use for scale values in legend - set to "f" (basic number), "e" (scientific
-notation), "pc" (percentage) or "integer" (for integer inputs where colours represent values rather than ranges)}
-
-\item{legend_dp}{Number of decimal places to use in scale values in legend (e.g. if legend_format is "f" and
-legend_dp is 1, numbers will appear as e.g. 10.0)}
-
-\item{legend_columns}{Number of columns in which to display legend values}
-
-\item{output_file}{Name of file to which to output map; if set to NULL, map is displayed without being saved to file
+\item{...}{Additional optional parameters:
+   lat_max,lat_min,long_max,long_min: borders if not to be set default
+   additional_border_shapes: Shape data for optional additional borders
+   border_colour_additional: colour to use for additional borders if any.
 '}
 }
 \description{
