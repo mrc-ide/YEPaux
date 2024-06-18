@@ -1,7 +1,7 @@
 Package: YEPaux
 Type: Package
 Title: Yellow Fever Dynamics Auxiliary Functions
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: person("Keith", "Fraser", email = "keith.fraser@imperial.ac.uk", role = c("aut", "cre"))
 Maintainers@R: person("Keith", "Fraser", email = "keith.fraser@imperial.ac.uk", role = c("aut", "cre"))
 Description: R package containing auxiliary functions for use with the YEP package. These functions have been split off to reduce the complexity of the main package.

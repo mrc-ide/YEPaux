@@ -90,6 +90,7 @@ display_multichain_progress <- function(datasets=list(),datasets_selected=c(1),b
     matplot(x=rows[[i]],y=like_values[[n_data]],type="l",col=n_data,add=TRUE)
   }
   title(main=title_text)
+  legend("bottomright",legend=as.character(datasets_selected),lty=rep(1,length(datasets_selected)),col=datasets_selected)
 
   return(list(like_values=like_values,MPSRF=MPSRF,diag_all=diag2))
 }
