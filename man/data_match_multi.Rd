@@ -24,7 +24,7 @@ positives}
 \item{obs_case_data}{Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 deaths}
 
-\item{...}{= Constant additional parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
+\item{...}{= Constant additional parameters/flags/etc. (n_reps,mode_start,dt,enviro_data,
 vaccine_efficacy,p_rep_severe,p_rep_death, TBA)}
 }
 \description{

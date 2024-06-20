@@ -19,20 +19,18 @@
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param ... = Constant additional parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,
-#'   R0_fixed_values, vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic,
+#' @param ... = Additional parameters/flags/etc. (n_reps,mode_start,dt,enviro_data,
+#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic,
 #'   mode_parallel, cluster, p_severe_inf,p_death_severe_inf)
 #'
 #' @export
 #'
-data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,
-                              obs_case_data=NULL,...){
+data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,obs_case_data=NULL,...){
 
   assert_that(all(params>0),msg="All parameter values must be positive")
   assert_that(input_data_check(input_data),
               msg="Input data must be in standard format (see https://mrc-ide.github.io/YEP/articles/CGuideAInputs.html )")
   const_list<-list(...)
-  assert_that(const_list$type %in% c("FOI","FOI+R0","FOI enviro","FOI+R0 enviro"))
   #TODO - Add additional assert_that checks?
 
   #Process input data to check that all regions with sero, case and/or outbreak data supplied are present, remove
@@ -41,13 +39,10 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,
   input_data=input_data_process(input_data,obs_sero_data,obs_case_data)
   regions=names(table(input_data$region_labels)) #Regions in new processed input data list
   n_regions=length(regions)
-  if(const_list$type %in% c("FOI+R0 enviro","FOI enviro")){
-    assert_that(is.null(const_list$enviro_data)==FALSE,
-                msg="const_list must include environmental data if FOI/R0 to be calculated from environmental covariates")
-    assert_that(all(regions %in% const_list$enviro_data$region),msg="All regions in input data must appear in environmental data")
-    enviro_data=subset(const_list$enviro_data,const_list$enviro_data$region %in% regions)
-    n_env_vars=ncol(enviro_data)-1
-  }
+  assert_that(is.null(const_list$enviro_data)==FALSE,msg="Inputs must include environmental data")
+  assert_that(all(regions %in% const_list$enviro_data$region),msg="All regions in input data must appear in environmental data")
+  enviro_data=subset(const_list$enviro_data,const_list$enviro_data$region %in% regions)
+  n_env_vars=ncol(enviro_data)-1
 
   frac=1.0/const_list$n_reps
   n_params=length(params)
@@ -56,9 +51,9 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,
   if(is.null(const_list$p_rep_severe)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_severe")}
   if(is.null(const_list$p_rep_death)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_death")}
   if(is.null(const_list$m_FOI_Brazil)==TRUE){extra_estimated_params=append(extra_estimated_params,"m_FOI_Brazil")}
-  names(params)=create_param_labels(const_list$type,input_data,const_list$enviro_data,extra_estimated_params)
+  names(params)=create_param_labels(const_list$enviro_data,extra_estimated_params)
 
-  mcmc_checks(params,n_regions,const_list$type,list(type="zero"),const_list$enviro_data,const_list$R0_fixed_values,
+  mcmc_checks(params,n_regions,list(type="zero"),const_list$enviro_data,
               add_values=list(vaccine_efficacy=const_list$vaccine_efficacy,p_rep_severe=const_list$p_rep_severe,
                               p_rep_death=const_list$p_rep_death,m_FOI_Brazil=const_list$m_FOI_Brazil),
               extra_estimated_params)
@@ -76,25 +71,13 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,
 
   #Get FOI and R0 values
   FOI_values=R0_values=rep(0,n_regions)
-  if(const_list$type %in% c("FOI+R0 enviro","FOI enviro")){
-    if(const_list$type=="FOI+R0 enviro"){enviro_coeffs=params[c(1:(2*n_env_vars))]
-    } else {
-      enviro_coeffs=params[c(1:n_env_vars)]}
-    for(i in 1:n_regions){
-      model_params=param_calc_enviro(enviro_coeffs,
-                                     as.numeric(enviro_data[enviro_data$region==regions[i],1+c(1:n_env_vars)]))
-      FOI_values[i]=model_params$FOI
-      if(substr(regions[i],1,3)=="BRA"){FOI_values[i]=FOI_values[i]*m_FOI_Brazil}
-      if(const_list$type=="FOI+R0 enviro"){R0_values[i]=model_params$R0} else {
-        R0_values[i]=const_list$R0_fixed_values[i]}
-    }
-  }
-  if(const_list$type %in% c("FOI+R0","FOI")){
-    FOI_values=params[c(1:n_regions)]
-    for(i in 1:n_regions){if(substr(regions[i],1,3)=="BRA"){FOI_values[i]=FOI_values[i]*m_FOI_Brazil}}
-
-    if(const_list$type=="FOI+R0"){R0_values=params[c((n_regions+1):(2*n_regions))]
-    } else {R0_values=const_list$R0_fixed_values}
+  enviro_coeffs=params[c(1:(2*n_env_vars))]
+  for(i in 1:n_regions){
+    model_params=param_calc_enviro(enviro_coeffs,
+                                   as.numeric(enviro_data[enviro_data$region==regions[i],1+c(1:n_env_vars)]))
+    FOI_values[i]=model_params$FOI
+    if(substr(regions[i],1,3)=="BRA"){FOI_values[i]=FOI_values[i]*m_FOI_Brazil}
+    R0_values[i]=model_params$R0
   }
 
   if(is.null(const_list$mode_parallel)){const_list$mode_parallel="none"}
@@ -129,7 +112,7 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param ... = Constant additional parameters/flags/etc. (type,n_reps,mode_start,dt,enviro_data,R0_fixed_values,
+#' @param ... = Constant additional parameters/flags/etc. (n_reps,mode_start,dt,enviro_data,
 #'   vaccine_efficacy,p_rep_severe,p_rep_death, TBA)
 #'
 #' @export
