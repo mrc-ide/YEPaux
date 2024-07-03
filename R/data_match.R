@@ -47,10 +47,10 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
   frac=1.0/const_list$n_reps
   n_params=length(params)
   extra_estimated_params=c()
-  if(is.null(const_list$vaccine_efficacy)==TRUE){extra_estimated_params=append(extra_estimated_params,"vaccine_efficacy")}
-  if(is.null(const_list$p_rep_severe)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_severe")}
-  if(is.null(const_list$p_rep_death)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_death")}
-  if(is.null(const_list$m_FOI_Brazil)==TRUE){extra_estimated_params=append(extra_estimated_params,"m_FOI_Brazil")}
+  if(is.na(const_list$vaccine_efficacy)==TRUE){extra_estimated_params=append(extra_estimated_params,"vaccine_efficacy")}
+  if(is.na(const_list$p_rep_severe)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_severe")}
+  if(is.na(const_list$p_rep_death)==TRUE){extra_estimated_params=append(extra_estimated_params,"p_rep_death")}
+  if(is.na(const_list$m_FOI_Brazil)==TRUE){extra_estimated_params=append(extra_estimated_params,"m_FOI_Brazil")}
   names(params)=create_param_labels(const_list$enviro_data,extra_estimated_params)
 
   mcmc_checks(params,n_regions,list(type="zero"),const_list$enviro_data,
