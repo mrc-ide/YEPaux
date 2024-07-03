@@ -27,7 +27,7 @@
 #'
 data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,obs_case_data=NULL,...){
 
-  assert_that(all(params>0),msg="All parameter values must be positive")
+  #assert_that(all(params>0),msg="All parameter values must be positive")
   assert_that(input_data_check(input_data),
               msg="Input data must be in standard format (see https://mrc-ide.github.io/YEP/articles/CGuideAInputs.html )")
   const_list<-list(...)
