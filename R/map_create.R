@@ -65,17 +65,17 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 #' @param text_size Size of text to appear in legend and titles
 #' @param display_axes TRUE/FALSE flag indicating whether to frame map and display latitude/longitude axes
 #' @param border_colour_regions Colour to use for borders of regions. Set to NA if borders to be invisible.
-#' @param ... Additional optional parameters:
-#'    lat_max,lat_min,long_max,long_min: borders if not to be set default
-#'    additional_border_shapes: Shape data for optional additional borders
-#'    border_colour_additional: colour to use for additional borders if any.
-#     map_title: Title to show above map
-#     legend_title: Title to show above legend
-#     legend_position: Position to place map legend if to be used
-#     legend_format: Number format to use for scale values in legend if used
-#     legend_dp: Number of decimal places to use in scale values in legend
-#     legend_columns: Number of columns in which to display legend values
-#     output_file: Name of file to which to output map
+#' @param ... Additional optional parameters: \cr
+#'    lat_max,lat_min,long_max,long_min: borders if not to be set default \cr
+#'    additional_border_shapes: Shape data for optional additional borders \cr
+#'    border_colour_additional: colour to use for additional borders if any. \cr
+#     map_title: Title to show above map \cr
+#     legend_title: Title to show above legend \cr
+#     legend_position: Position to place map legend if to be used \cr
+#     legend_format: Number format to use for scale values in legend if used \cr
+#     legend_dp: Number of decimal places to use in scale values in legend \cr
+#     legend_columns: Number of columns in which to display legend values \cr
+#     output_file: Name of file to which to output map \cr
 #' '
 #' @export
 #'
@@ -145,26 +145,26 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   #Create graph
   par(mar=c(1,1,1,1))
   if(is.null(ap$output_file)==FALSE){png(filename=ap$output_file,width=width_px,height=height_px)}
-  {
-    matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
-            axes=display_axes,frame.plot=display_axes)
-    for(n_region in 1:n_regions){
-      plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
-           add=TRUE)
-    }
-    if(is.null(ap$additional_border_shapes)==FALSE){
-      n_shapes_additional=length(ap$additional_border_shapes$shapes)
-      for(j in 1:n_shapes_additional){
-        plot(st_geometry(ap$additional_border_shapes$shapes[[j]]),col=NA,border=ap$border_colour_additional,add=TRUE)
-      }
-    }
-    if(is.null(ap$legend_position)==FALSE){
-      if(is.null(ap$legend_columns)){ap$legend_columns=1}
-      legend(ap$legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=ap$legend_title,
-             ncol=ap$legend_columns)
-    }
-    title(main=ap$map_title,cex.main=text_size)
+
+  matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
+          axes=display_axes,frame.plot=display_axes)
+  for(n_region in 1:n_regions){
+    plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
+         add=TRUE)
   }
+  if(is.null(ap$additional_border_shapes)==FALSE){
+    n_shapes_additional=length(ap$additional_border_shapes$shapes)
+    for(j in 1:n_shapes_additional){
+      plot(st_geometry(ap$additional_border_shapes$shapes[[j]]),col=NA,border=ap$border_colour_additional,add=TRUE)
+    }
+  }
+  if(is.null(ap$legend_position)==FALSE){
+    if(is.null(ap$legend_columns)){ap$legend_columns=1}
+    legend(ap$legend_position,legend=legend_labels,fill=colour_scale2,cex=text_size,title=ap$legend_title,
+           ncol=ap$legend_columns)
+  }
+  title(main=ap$map_title,cex.main=text_size)
+
   if(is.null(ap$output_file)==FALSE){dev.off()}
   par(mar=c(4,4,4,4))
 
