@@ -21,12 +21,14 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
   assert_that(is.character(region_label_type))
 
   n_regions=length(regions)
-  shape_data_all=list(regions=regions,shapes=rep(NULL,n_regions),
-                      lat_min=Inf,long_min=Inf,lat_max=-Inf,long_max=-Inf)
 
   for(i in 1:length(shapefiles)){
     shape_data=read_sf(shapefiles[i])
     assert_that(region_label_type %in% names(shape_data))
+    if(i==1){
+      shape_data_all=list(regions=regions,shapes=shape_data$geometry[1],
+                          lat_min=Inf,long_min=Inf,lat_max=-Inf,long_max=-Inf)
+    }
     bbox=st_bbox(shape_data)
     shape_data_all$lat_min=min(shape_data_all$lat_min,bbox[2])
     shape_data_all$lat_max=max(shape_data_all$lat_max,bbox[4])
