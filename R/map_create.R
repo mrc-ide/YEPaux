@@ -21,31 +21,24 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
   assert_that(is.character(region_label_type))
 
   n_regions=length(regions)
-
   for(i in 1:length(shapefiles)){
     shape_data=read_sf(shapefiles[i])
-    assert_that(region_label_type %in% names(shape_data))
-    if(i==1){
-      shape_data_all=list(regions=regions,shapes=shape_data$geometry[1],
-                          lat_min=Inf,long_min=Inf,lat_max=-Inf,long_max=-Inf)
-    }
-    bbox=st_bbox(shape_data)
-    shape_data_all$lat_min=min(shape_data_all$lat_min,bbox[2])
-    shape_data_all$lat_max=max(shape_data_all$lat_max,bbox[4])
-    shape_data_all$long_min=min(shape_data_all$long_min,bbox[1])
-    shape_data_all$long_max=max(shape_data_all$long_max,bbox[3])
-    j=match(region_label_type,names(shape_data))
-    file_regions=shape_data[[j]]
+    assert_that(region_label_type %in% names(shape_data),msg=paste0("Region label not found in ",
+                                                                    shapefiles[i]))
+    if(i==1){shape_data_all=st_sf(data.frame(region=rep(NA,n_regions),
+                                             geom=rep(shape_data$geometry[1],n_regions)))}
+    file_regions=shape_data[[match(region_label_type,names(shape_data))]]
+
     for(n_region in 1:n_regions){
-      k=match(regions[n_region],file_regions)
+      region=regions[n_region]
+      k=match(region,file_regions)
       if(is.na(k)==FALSE){
-        shape_data_all$shapes[[n_region]]=shape_data$geometry[[k]]
+        shape_data_all$region[n_region]=region
+        shape_data_all$geometry[n_region]=shape_data$geometry[k]
       }
     }
   }
-  assert_that(length(shape_data_all$shapes)==n_regions,msg="Region data missing")
-  for(n_region in 1:n_regions){assert_that(is.null(shape_data_all$shapes[[n_region]])==FALSE,
-                                                    msg=paste("No shape data found for region",n_region))}
+  assert_that(all(shape_data_all$region==regions),msg="Missing region data")
 
   return(shape_data_all)
 }
@@ -149,7 +142,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
           axes=display_axes,frame.plot=display_axes)
   for(n_region in 1:n_regions){
-    plot(st_geometry(shape_data$shapes[[n_region]]),col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
+    plot(shape_data$geometry[n_region],col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
          add=TRUE)
   }
   if(is.null(ap$additional_border_shapes)==FALSE){

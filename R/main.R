@@ -14,7 +14,7 @@ t_infectious <- 5 #Time cases remain infectious
 #' @importFrom graphics axis image legend matplot par title
 #' @importFrom grDevices dev.off png
 #' @importFrom Rmisc CI
-#' @importFrom sf read_sf st_bbox st_geometry
+#' @importFrom sf read_sf st_sf
 #' @importFrom stats cov dexp dnbinom dnorm median prop.test rbinom runif var
 #' @importFrom utils read.csv write.csv
 #' @import YEP
