@@ -80,14 +80,15 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   assert_that(is.numeric(scale))
   assert_that(is.logical(display_axes))
   n_regions=length(param_values)
-  assert_that(n_regions==length(shape_data$shapes))
+  assert_that(n_regions==length(shape_data$geometry))
   ap=list(...) #Get additional optional parameters
 
   #Set map dimensions
-  if(is.null(ap$lat_max)){ap$lat_max=shape_data$lat_max}
-  if(is.null(ap$lat_min)){ap$lat_min=shape_data$lat_min}
-  if(is.null(ap$long_max)){ap$long_max=shape_data$long_max}
-  if(is.null(ap$long_min)){ap$long_min=shape_data$long_min}
+  bbox=st_bbox(shape_data)
+  if(is.null(ap$lat_max)){ap$lat_max=bbox$ymin}
+  if(is.null(ap$lat_min)){ap$lat_min=bbox$ymax}
+  if(is.null(ap$long_max)){ap$long_max=bbox$xmax}
+  if(is.null(ap$long_min)){ap$long_min=bbox$xmin}
   height_ll=ap$lat_max-ap$lat_min
   width_ll=ap$long_max-ap$long_min
   pixel_scale=pixels_max/max(height_ll,width_ll)

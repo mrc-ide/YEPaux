@@ -122,8 +122,8 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
 
   if(type %in% c("FOI enviro","FOI+R0 enviro")){
     assert_that(is.data.frame((enviro_data)))
-    assert_that(all(enviro_data$region==sort(enviro_data$region)),
-                msg="Regions in environmental data must be in alphabetical order")
+    # assert_that(all(enviro_data$region==sort(enviro_data$region)),
+    #             msg="Regions in environmental data must be in alphabetical order")
     n_env_vars=ncol(enviro_data)-1
     env_vars=colnames(enviro_data)[c(2:(n_env_vars+1))]
 
