@@ -142,15 +142,9 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
 
   matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
           axes=display_axes,frame.plot=display_axes)
-  for(n_region in 1:n_regions){
-    plot(shape_data$geometry[n_region],col=colour_scale2[scale_values[n_region]],border=border_colour_regions,
-         add=TRUE)
-  }
+  plot(shape_data$geometry,col=colour_scale2[scale_values],border=border_colour_regions,add=TRUE)
   if(is.null(ap$additional_border_shapes)==FALSE){
-    n_shapes_additional=length(ap$additional_border_shapes$shapes)
-    for(j in 1:n_shapes_additional){
-      plot(st_geometry(ap$additional_border_shapes$shapes[[j]]),col=NA,border=ap$border_colour_additional,add=TRUE)
-    }
+    plot(ap$additional_border_shapes$geometry,col=NA,border=ap$border_colour_additional,add=TRUE)
   }
   if(is.null(ap$legend_position)==FALSE){
     if(is.null(ap$legend_columns)){ap$legend_columns=1}
