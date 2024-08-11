@@ -16,6 +16,8 @@
 #'
 map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 
+  #TODO - Change function to deal with inputs where "geometry" called something else
+
   assert_that(is.character(regions))
   assert_that(is.character(shapefiles))
   assert_that(is.character(region_label_type))
