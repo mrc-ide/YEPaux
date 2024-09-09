@@ -87,8 +87,8 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
 
   #Set map dimensions
   bbox=st_bbox(shape_data)
-  if(is.null(ap$lat_max)){ap$lat_max=bbox$ymin}
-  if(is.null(ap$lat_min)){ap$lat_min=bbox$ymax}
+  if(is.null(ap$lat_max)){ap$lat_max=bbox$ymax}
+  if(is.null(ap$lat_min)){ap$lat_min=bbox$ymin}
   if(is.null(ap$long_max)){ap$long_max=bbox$xmax}
   if(is.null(ap$long_min)){ap$long_min=bbox$xmin}
   height_ll=ap$lat_max-ap$lat_min
