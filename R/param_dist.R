@@ -51,8 +51,8 @@ get_FOI_R0_dist_data <- function(FOI_R0_values = list(), sorting_metric_values =
   }
   n_025=ceiling(n_entries*0.025)
   n_25=ceiling(n_entries*0.25)
-  n_75=floor(n_entries*0.75)
-  n_975=floor(n_entries*0.975)
+  n_75=max(1,floor(n_entries*0.75))
+  n_975=max(1,floor(n_entries*0.975))
 
   for(i in 1:n_regions){
     lines=i+(n_regions*c(0:(n_entries-1)))
