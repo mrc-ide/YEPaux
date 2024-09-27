@@ -77,6 +77,8 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale=c(),pixels_max=720,text_size=1,
                        display_axes=FALSE,border_colour_regions="grey",...){
 
+  #TODO - Add additional image making options (resolution, file type sensitivity)
+
   assert_that(is.list(shape_data))
   assert_that(is.numeric(param_values))
   assert_that(is.numeric(scale))
@@ -141,6 +143,7 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
   #Create graph
   par(mar=c(1,1,1,1))
   if(is.null(ap$output_file)==FALSE){png(filename=ap$output_file,width=width_px,height=height_px)}
+  #if(is.null(ap$output_file)==FALSE){tiff(filename=ap$output_file,width=width_px,height=height_px,res=300)}
 
   matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
           axes=display_axes,frame.plot=display_axes)

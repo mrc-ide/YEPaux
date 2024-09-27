@@ -157,6 +157,8 @@ data_match_multi <- function(param_sets=list(),input_data=list(),obs_sero_data=N
 sero_match_graphs <- function(model_data=list(),obs_sero_data=list(),plot_type="mean",text_size=1.0,
                               hide_observed=FALSE){
 
+  #TODO - Add image adjustment options
+
   assert_that(is.list(model_data)) #TODO - improve checks on model_data
   assert_that(is.data.frame(obs_sero_data))
   assert_that(plot_type %in% c("mean","all"),msg="plot_type must be 'mean' or 'all'")
@@ -287,7 +289,7 @@ sero_match_graphs <- function(model_data=list(),obs_sero_data=list(),plot_type="
     }
 
     if(hide_observed==FALSE){
-      sero_graphs[[i]] <- sero_graphs[[i]]+geom_point(data=df,aes(x=age_values,y=sero_obs,size=log(samples)),
+      sero_graphs[[i]] <- sero_graphs[[i]]+geom_point(data=df,aes(x=age_values,y=sero_obs,size=log(samples)), #TODO - amend size
                                                       show.legend=FALSE)
       sero_graphs[[i]] <- sero_graphs[[i]]+geom_errorbar(data=df,aes(x=age_values,ymin=sero_obs_low,
                                                                      ymax=sero_obs_high),width=1.0)
