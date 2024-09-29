@@ -271,13 +271,13 @@ sero_match_graphs <- function(model_data=list(),obs_sero_data=list(),plot_type="
     lines=lines_all[graph_lines==i]
 
     df=data.frame(age_values=obs_sero_data$age_min[lines],sero_obs=obs_sero_values[lines],
-                  samples=obs_sero_data$samples[lines],
+                  samples=obs_sero_data$samples[lines],sizes=obs_sero_data$samples[lines]/max(obs_sero_data$samples[lines]),
                   sero_obs_low=obs_sero_values_low[lines],sero_obs_high=obs_sero_values_high[lines],
                   sero_model_low95=model_CI95_low[lines],sero_model_high95=model_CI95_high[lines],
                   sero_model_low50=model_CI50_low[lines],sero_model_high50=model_CI50_high[lines])
     df$samples[df$samples==0]=1
 
-    samples=NULL
+    samples=sizes=NULL
     sero_graphs[[i]] <- ggplot(data=df) + theme_bw()+labs(title=graph_titles[i])
     sero_graphs[[i]] <- sero_graphs[[i]]+geom_ribbon(data=df,aes(x=age_values,ymin=sero_model_low95,
                                                                  ymax=sero_model_high95),fill="blue",alpha=0.5)
@@ -289,7 +289,7 @@ sero_match_graphs <- function(model_data=list(),obs_sero_data=list(),plot_type="
     }
 
     if(hide_observed==FALSE){
-      sero_graphs[[i]] <- sero_graphs[[i]]+geom_point(data=df,aes(x=age_values,y=sero_obs,size=log(samples)), #TODO - amend size
+      sero_graphs[[i]] <- sero_graphs[[i]]+geom_point(data=df,aes(x=age_values,y=sero_obs,size=sizes), #TODO - amend size
                                                       show.legend=FALSE)
       sero_graphs[[i]] <- sero_graphs[[i]]+geom_errorbar(data=df,aes(x=age_values,ymin=sero_obs_low,
                                                                      ymax=sero_obs_high),width=1.0)

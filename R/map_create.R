@@ -142,8 +142,8 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
 
   #Create graph
   par(mar=c(1,1,1,1))
-  if(is.null(ap$output_file)==FALSE){png(filename=ap$output_file,width=width_px,height=height_px)}
-  #if(is.null(ap$output_file)==FALSE){tiff(filename=ap$output_file,width=width_px,height=height_px,res=300)}
+  #if(is.null(ap$output_file)==FALSE){png(filename=ap$output_file,width=width_px,height=height_px)}
+  if(is.null(ap$output_file)==FALSE){tiff(filename=ap$output_file,width=width_px,height=height_px,compression="zip")}
 
   matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
           axes=display_axes,frame.plot=display_axes)
