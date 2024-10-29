@@ -12,7 +12,7 @@ t_infectious <- 5 #Time cases remain infectious
 #' @importFrom ggplot2 geom_point geom_ribbon geom_violin ggplot labs
 #' @importFrom ggplot2 scale_x_continuous scale_x_discrete scale_y_continuous theme theme_bw
 #' @importFrom graphics axis image legend matplot par title
-#' @importFrom grDevices dev.off png
+#' @importFrom grDevices dev.off png tiff
 #' @importFrom Rmisc CI
 #' @importFrom sf read_sf st_bbox st_geometry st_sf
 #' @importFrom stats cov dexp dnbinom dnorm median prop.test rbinom runif var

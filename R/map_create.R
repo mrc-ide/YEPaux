@@ -70,7 +70,7 @@ map_shapes_load <- function(regions=c(),shapefiles=c(),region_label_type=""){
 #     legend_format: Number format to use for scale values in legend if used \cr
 #     legend_dp: Number of decimal places to use in scale values in legend \cr
 #     legend_columns: Number of columns in which to display legend values \cr
-#     output_file: Name of file to which to output map \cr
+#     output_file: Name of file to which to output map (ending .png or .tif) \cr
 #' '
 #' @export
 #'
@@ -142,9 +142,12 @@ create_map <- function(shape_data=list(),param_values=c(),scale=c(),colour_scale
 
   #Create graph
   par(mar=c(1,1,1,1))
-  #if(is.null(ap$output_file)==FALSE){png(filename=ap$output_file,width=width_px,height=height_px)}
-  if(is.null(ap$output_file)==FALSE){tiff(filename=ap$output_file,width=width_px,height=height_px,compression="zip")}
-
+  if(is.null(ap$output_file)==FALSE){
+    filetype=substr(ap$output_file,nchar(ap$output_file)-3,nchar(ap$output_file))
+    assert_that(filetype %in% c(".png",".tif"))
+    if(filetype==".png"){png(filename=ap$output_file,width=width_px,height=height_px)}
+    if(filetype==".tif"){tiff(filename=ap$output_file,width=width_px,height=height_px,compression="zip")}
+    }
   matplot(x=c(ap$long_min,ap$long_max),y=c(ap$lat_min,ap$lat_max),col=0,xlab="",ylab="",
           axes=display_axes,frame.plot=display_axes)
   plot(shape_data$geometry,col=colour_scale2[scale_values],border=border_colour_regions,add=TRUE)
