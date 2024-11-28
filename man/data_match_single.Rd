@@ -24,8 +24,8 @@ positives}
 \item{obs_case_data}{Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 deaths}
 
-\item{...}{= Additional parameters/flags/etc. (n_reps,mode_start,dt,enviro_data,
-vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic,
+\item{...}{= Additional parameters/flags/etc. (n_reps,mode_start,time_inc,enviro_data,
+vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic, mode_time,
 mode_parallel, cluster, p_severe_inf,p_death_severe_inf)}
 }
 \description{

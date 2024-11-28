@@ -19,8 +19,8 @@
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param ... = Additional parameters/flags/etc. (n_reps,mode_start,dt,enviro_data,
-#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic,
+#' @param ... = Additional parameters/flags/etc. (n_reps,mode_start,time_inc,enviro_data,
+#'   vaccine_efficacy,p_rep_severe,p_rep_death,m_FOI_Brazil, deterministic, mode_time,
 #'   mode_parallel, cluster, p_severe_inf,p_death_severe_inf)
 #'
 #' @export
@@ -86,7 +86,7 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
   dataset <- Generate_Dataset(input_data,FOI_values,R0_values,obs_sero_data,obs_case_data,
                               vaccine_efficacy,const_list$p_severe_inf,const_list$p_death_severe_inf,
                               p_rep_severe,p_rep_death,const_list$mode_start,const_list$start_SEIRV,
-                              const_list$dt,const_list$n_reps,const_list$deterministic,
+                              const_list$time_inc,const_list$n_reps,const_list$deterministic,const_list$mode_time,
                               const_list$mode_parallel,const_list$cluster)
 
   return(dataset)
@@ -112,7 +112,7 @@ data_match_single <- function(params=c(),input_data=list(),obs_sero_data=NULL,ob
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
 #'   deaths
-#' @param ... = Constant additional parameters/flags/etc. (n_reps,mode_start,dt,enviro_data,
+#' @param ... = Constant additional parameters/flags/etc. (n_reps,mode_start,time_inc,enviro_data,
 #'   vaccine_efficacy,p_rep_severe,p_rep_death, TBA)
 #'
 #' @export
