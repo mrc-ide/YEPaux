@@ -14,7 +14,7 @@ plot_mcmc_prob_data(
 \arguments{
 \item{input_frame}{Data frame of MCMC output data}
 
-\item{plot_type}{Type of plots to create (choose from "box","violin","error_bars")}
+\item{plot_type}{Type of plots to create (choose from "box", "violin", "error_bars")}
 
 \item{values}{List of names of parameters to plot (must be parameters appearing in the data)}
 

@@ -16,7 +16,7 @@ plot_mcmc_FOI_R0_data(
 
 \item{regions}{List of region names}
 
-\item{plot_type}{Type of plots to create (choose from "box","violin","error_bars","scatter")}
+\item{plot_type}{Type of plots to create (choose from "box", "violin", "error_bars", "scatter")}
 
 \item{text_size1}{Text size parameter for axis labels
 '}

@@ -19,7 +19,7 @@ get_mcmc_params <- function(chain=list()){
   assert_that("flag_accept" %in% column_names)
 
   if("posterior_prop" %in% column_names){n_start=3} else {n_start=2}
-  n_end=match("flag_accept",column_names)-1
+  n_end=match("flag_accept", column_names)-1
   columns=c(n_start:n_end)
   param_names=column_names[columns]
 
@@ -39,23 +39,23 @@ get_mcmc_params <- function(chain=list()){
 #' '
 #' @export
 #'
-get_mcmc_data <- function(input_folder="",plot_graph=TRUE){
+get_mcmc_data <- function(input_folder="", plot_graph=TRUE){
 
-  assert_that(file.exists(input_folder),msg="Valid input folder must be specified")
+  assert_that(file.exists(input_folder), msg="Valid input folder must be specified")
 
-  file_list=list.files(path=input_folder,pattern="*.csv")
+  file_list=list.files(path=input_folder, pattern="*.csv")
   input_frame=data.frame()
   for(i in 1:length(file_list)){
-    data=read.csv(paste(input_folder,file_list[i],sep="/"),header=TRUE)
+    data=read.csv(paste(input_folder, file_list[i], sep="/"), header=TRUE)
     if(i==1){
       param_names=get_mcmc_params(data)
-      columns=colnames(data) %in% c("posterior_current",param_names)
+      columns=colnames(data) %in% c("posterior_current", param_names)
     }
-    input_frame<-rbind(input_frame,data[,columns])
+    input_frame<-rbind(input_frame, data[, columns])
   }
 
   if(plot_graph==TRUE){
-    matplot(x=c(1:nrow(input_frame)),y=input_frame$posterior_current,type="l",xlab="Iteration",ylab="LogLikelihood")}
+    matplot(x=c(1:nrow(input_frame)), y=input_frame$posterior_current, type="l", xlab="Iteration", ylab="LogLikelihood")}
 
   return(input_frame)
 }
@@ -77,22 +77,24 @@ get_mcmc_data <- function(input_folder="",plot_graph=TRUE){
 #' '
 #' @export
 #'
-truncate_mcmc_data <- function(input_frame=list(),rows=c(1),plot_graph=TRUE){
+truncate_mcmc_data <- function(input_frame=list(), rows=c(1), plot_graph=TRUE){
   assert_that(is.data.frame(input_frame))
   assert_that("posterior_current" %in% colnames(input_frame))
   assert_that(is.integer(rows))
   assert_that(is.logical(plot_graph))
 
   line_list=c(1:nrow(input_frame))
-  input_frame <- cbind(input_frame,line_list)
-  input_frame_truncated=input_frame[rows,]
+  input_frame <- cbind(input_frame, line_list)
+  input_frame_truncated=input_frame[rows, ]
 
-  if(plot_graph==TRUE){matplot(x=rows,y=input_frame_truncated$posterior_current,
-                               type="l",xlab="Iteration",ylab="LogLikelihood")}
+  if(plot_graph==TRUE){matplot(x=rows, y=input_frame_truncated$posterior_current,
+                               type="l", xlab="Iteration", ylab="LogLikelihood")}
 
   return(input_frame_truncated)
 }
 #-------------------------------------------------------------------------------
+# TODO - Update for mixed constant/variable environmental covariates
+# TODO - Get rid of different modes, assume type="FOI+R0 enviro"
 #' @title get_mcmc_FOI_R0_data
 #'
 #' @description Extract spillover force of infection (FOI) and reproduction number (R0) values from MCMC output data
@@ -104,32 +106,32 @@ truncate_mcmc_data <- function(input_frame=list(),rows=c(1),plot_graph=TRUE){
 #' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
 #'   combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings
 #' @param type Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-#'   covariates); choose from "FOI","FOI+R0","FOI enviro","FOI+R0 enviro"
+#'   covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"
 #' @param enviro_data Data frame of environmental covariate values used to calculate FOI and R0 in MCMC run, by region
 #'   (NOTE: the data frame should include only the relevant environmental covariates; any not used in the MCMC fit
 #'    should be removed)
 #' '
 #' @export
 #'
-get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=list()){
+get_mcmc_FOI_R0_data <- function(input_frame=list(), type="FOI+R0", enviro_data=list()){
   assert_that(is.data.frame(input_frame))
-  assert_that(type %in% c("FOI","FOI+R0","FOI enviro","FOI+R0 enviro"))
+  assert_that(type %in% c("FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"))
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
     param_names=colnames(input_frame)}
   param_names=param_names[param_names != "posterior_current"]
   columns=which(colnames(input_frame) %in% param_names)
 
-  if(type %in% c("FOI enviro","FOI+R0 enviro")){
+  if(type %in% c("FOI enviro", "FOI+R0 enviro")){
     assert_that(is.data.frame((enviro_data)))
     # assert_that(all(enviro_data$region==sort(enviro_data$region)),
     #             msg="Regions in environmental data must be in alphabetical order")
     n_env_vars=ncol(enviro_data)-1
     env_vars=colnames(enviro_data)[c(2:(n_env_vars+1))]
 
-    assert_that(all(param_names[c(1:n_env_vars)]==paste("FOI_",env_vars,sep="")),
+    assert_that(all(param_names[c(1:n_env_vars)]==paste("FOI_", env_vars, sep="")),
                 msg="Environmental covariates in environmental data and input frame must match")
-    if(type=="FOI+R0 enviro"){assert_that(all(param_names[n_env_vars+c(1:n_env_vars)]==paste("R0_",env_vars,sep="")),
+    if(type=="FOI+R0 enviro"){assert_that(all(param_names[n_env_vars+c(1:n_env_vars)]==paste("R0_", env_vars, sep="")),
                                           msg="Environmental covariates in environmental data and input frame must match")}
 
     regions=enviro_data$region
@@ -137,35 +139,35 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
   } else {
     n_regions=0
     for(i in 1:length(param_names)){
-      prefix=substr(param_names[i],1,3)
+      prefix=substr(param_names[i], 1, 3)
       if(prefix=="FOI"){n_regions=n_regions+1}
     }
   }
 
   n_lines=nrow(input_frame)
-  blank=rep(NA,n_regions*n_lines)
-  output_frame=data.frame(n_region=as.factor(rep(c(1:n_regions),n_lines)),region=rep(regions,n_lines),FOI=blank)
-  if(type %in% c("FOI+R0","FOI+R0 enviro")){
+  blank=rep(NA, n_regions*n_lines)
+  output_frame=data.frame(n_region=as.factor(rep(c(1:n_regions), n_lines)), region=rep(regions, n_lines), FOI=blank)
+  if(type %in% c("FOI+R0", "FOI+R0 enviro")){
     R0=blank
-    output_frame=cbind(output_frame,R0)}
+    output_frame=cbind(output_frame, R0)}
 
-  if(type %in% c("FOI enviro","FOI+R0 enviro")){
+  if(type %in% c("FOI enviro", "FOI+R0 enviro")){
 
     columns1=columns[c(1:n_env_vars)]
-    output_frame$FOI=as.vector(as.matrix(enviro_data[,c(2:(n_env_vars+1))]) %*% t(as.matrix(input_frame[,columns1])))
+    output_frame$FOI=as.vector(as.matrix(enviro_data[, c(2:(n_env_vars+1))]) %*% t(as.matrix(input_frame[, columns1])))
     if(type=="FOI+R0 enviro"){
       columns2=columns[c(1:n_env_vars)]+n_env_vars
-      output_frame$R0=as.vector(as.matrix(enviro_data[,c(2:(n_env_vars+1))]) %*% t(as.matrix(input_frame[,columns2])))
+      output_frame$R0=as.vector(as.matrix(enviro_data[, c(2:(n_env_vars+1))]) %*% t(as.matrix(input_frame[, columns2])))
     }
 
   } else {
-    output_frame$FOI=as.vector(t(as.matrix(input_frame[,columns[c(1:n_regions)]])))
-    if(type=="FOI+R0"){output_frame$R0=as.vector(t(as.matrix(input_frame[,columns[c(1:n_regions)+n_regions]])))}
+    output_frame$FOI=as.vector(t(as.matrix(input_frame[, columns[c(1:n_regions)]])))
+    if(type=="FOI+R0"){output_frame$R0=as.vector(t(as.matrix(input_frame[, columns[c(1:n_regions)+n_regions]])))}
   }
 
   if("m_FOI_Brazil" %in% colnames(input_frame)){
     for(i in 1:n_regions){
-      if(substr(regions[i],1,3)=="BRA"){
+      if(substr(regions[i], 1, 3)=="BRA"){
         lines=i+(n_regions*c(0:(n_lines-1)))
         output_frame$FOI[lines]=output_frame$FOI[lines]*input_frame$m_FOI_Brazil
       }
@@ -191,36 +193,36 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(),type="FOI+R0",enviro_data=li
 #' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
 #'   combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings
 #' @param type Type of parameter set (FOI and/or R0 coefficients associated with environmental
-#'   covariates); choose from "FOI enviro","FOI+R0 enviro"
+#'   covariates); choose from "FOI enviro", "FOI+R0 enviro"
 #' '
 #' @export
 #'
-get_mcmc_enviro_coeff_data <- function(input_frame=list(),type="FOI+R0 enviro"){
+get_mcmc_enviro_coeff_data <- function(input_frame=list(), type="FOI+R0 enviro"){
   assert_that(is.data.frame((input_frame)))
-  assert_that(type %in% c("FOI enviro","FOI+R0 enviro"))
+  assert_that(type %in% c("FOI enviro", "FOI+R0 enviro"))
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
     param_names=colnames(input_frame)}
   param_names=param_names[param_names != "posterior_current"]
   columns=which(colnames(input_frame) %in% param_names)
 
-  columns_FOI_coeffs=which(substr(colnames(input_frame),1,3)=="FOI")
+  columns_FOI_coeffs=which(substr(colnames(input_frame), 1, 3)=="FOI")
   n_env_vars=length(columns_FOI_coeffs)
-  env_vars=substr(param_names[c(1:n_env_vars)],5,1000)
+  env_vars=substr(param_names[c(1:n_env_vars)], 5, 1000)
 
   n_lines=nrow(input_frame)
-  blank=rep(NA,n_env_vars*n_lines)
-  output_frame=data.frame(n_env_var=as.factor(rep(c(1:n_env_vars),n_lines)),env_var=blank,FOI_coeffs=blank)
+  blank=rep(NA, n_env_vars*n_lines)
+  output_frame=data.frame(n_env_var=as.factor(rep(c(1:n_env_vars), n_lines)), env_var=blank, FOI_coeffs=blank)
   output_frame$env_var=env_vars[output_frame$n_env_var]
   if(type=="FOI+R0 enviro"){
     R0_coeffs=blank
-    output_frame=cbind(output_frame,R0_coeffs)}
+    output_frame=cbind(output_frame, R0_coeffs)}
 
   columns1=columns[c(1:n_env_vars)]
-  output_frame$FOI_coeffs=as.vector(t(input_frame[,columns1]))
+  output_frame$FOI_coeffs=as.vector(t(input_frame[, columns1]))
   if(type=="FOI+R0 enviro"){
     columns2=columns[c(1:n_env_vars)]+n_env_vars
-    output_frame$R0_coeffs=as.vector(t(input_frame[,columns2]))
+    output_frame$R0_coeffs=as.vector(t(input_frame[, columns2]))
   }
 
   return(output_frame)

@@ -40,19 +40,19 @@ get_FOI_R0_dist_data <- function(FOI_R0_values = list(), sorting_metric_values =
     sort_order=order(sorting_metric_values)
   }
 
-  bl=rep(NA,n_regions)
+  bl=rep(NA, n_regions)
   if(flag_R0==0){
-    FOI_R0_summary=data.frame(n_region=c(1:n_regions),region=regions,
-                              FOI_025=bl,FOI_25=bl,FOI_50=bl,FOI_75=bl,FOI_975=bl,FOI_mean=bl,FOI_cv=bl)
+    FOI_R0_summary=data.frame(n_region=c(1:n_regions), region=regions,
+                              FOI_025=bl, FOI_25=bl, FOI_50=bl, FOI_75=bl, FOI_975=bl, FOI_mean=bl, FOI_cv=bl)
   } else {
-    FOI_R0_summary=data.frame(n_region=c(1:n_regions),region=regions,
-                              FOI_025=bl,FOI_25=bl,FOI_50=bl,FOI_75=bl,FOI_975=bl,FOI_mean=bl,FOI_cv=bl,
-                              R0_025=bl,R0_25=bl,R0_50=bl,R0_75=bl,R0_975=bl,R0_mean=bl,R0_cv=bl)
+    FOI_R0_summary=data.frame(n_region=c(1:n_regions), region=regions,
+                              FOI_025=bl, FOI_25=bl, FOI_50=bl, FOI_75=bl, FOI_975=bl, FOI_mean=bl, FOI_cv=bl,
+                              R0_025=bl, R0_25=bl, R0_50=bl, R0_75=bl, R0_975=bl, R0_mean=bl, R0_cv=bl)
   }
   n_025=ceiling(n_entries*0.025)
   n_25=ceiling(n_entries*0.25)
-  n_75=max(1,floor(n_entries*0.75))
-  n_975=max(1,floor(n_entries*0.975))
+  n_75=max(1, floor(n_entries*0.75))
+  n_975=max(1, floor(n_entries*0.975))
 
   for(i in 1:n_regions){
     lines=i+(n_regions*c(0:(n_entries-1)))
@@ -100,7 +100,7 @@ get_FOI_R0_dist_data <- function(FOI_R0_values = list(), sorting_metric_values =
 #' '
 #' @export
 #'
-mcmc_R0_value_probs <- function(FOI_R0_values=list(),R0_target_values=c(1.0)){
+mcmc_R0_value_probs <- function(FOI_R0_values=list(), R0_target_values=c(1.0)){
 
   regions=unique(FOI_R0_values$region)
   n_regions=length(regions)
@@ -109,14 +109,14 @@ mcmc_R0_value_probs <- function(FOI_R0_values=list(),R0_target_values=c(1.0)){
   n_values=length(R0_target_values)
   R0_probs=data.frame(region=regions)
   for(i in 1:n_values){
-    R0_probs[,i+1]=rep(NA,n_regions)
-    colnames(R0_probs)[i+1]=paste0("P(R0>=",R0_target_values[i],")")
+    R0_probs[, i+1]=rep(NA, n_regions)
+    colnames(R0_probs)[i+1]=paste0("P(R0>=", R0_target_values[i], ")")
   }
   for(n_region in 1:n_regions){
     lines=n_region+((c(1:n_entries)-1)*n_regions)
     R0_values=FOI_R0_values$R0[lines]
     for(i in 1:n_values){
-      R0_probs[n_region,i+1]=sum(R0_values>=R0_target_values[i])/n_entries
+      R0_probs[n_region, i+1]=sum(R0_values>=R0_target_values[i])/n_entries
     }
   }
 

@@ -15,7 +15,7 @@ get_mcmc_FOI_R0_data(
 combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings}
 
 \item{type}{Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-covariates); choose from "FOI","FOI+R0","FOI enviro","FOI+R0 enviro"}
+covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"}
 
 \item{enviro_data}{Data frame of environmental covariate values used to calculate FOI and R0 in MCMC run, by region
   (NOTE: the data frame should include only the relevant environmental covariates; any not used in the MCMC fit

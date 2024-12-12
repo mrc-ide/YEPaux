@@ -38,18 +38,18 @@ t_infectious <- 5 #Time cases remain infectious
 plot_region_input_data <- function(input_data = list(), region = "", data_type = "vacc", colour_scale = c(),
                                    output_filename = NULL, pixel_width = 480, pixel_height = 480){
   assert_that(region %in% input_data$region_labels)
-  assert_that(data_type %in% c("vacc","pop"))
+  assert_that(data_type %in% c("vacc", "pop"))
 
   if(is.null(output_filename)==FALSE){png(output_filename, width = pixel_width, height = pixel_height)}
   if(data_type=="vacc"){
-    image(x=input_data$years_labels,y=input_data$age_labels,z=input_data$vacc_data[input_data$region_labels==region,,],
-          zlim=c(0,1),xlab="Year",ylab="Age",col = colour_scale)
-    title(main=paste(region,"- calculated vaccination immunity by date + age"))
+    image(x=input_data$years_labels, y=input_data$age_labels, z=input_data$vacc_data[input_data$region_labels==region, , ],
+          zlim=c(0, 1), xlab="Year", ylab="Age", col = colour_scale)
+    title(main=paste(region, "- calculated vaccination immunity by date + age"))
   } else {
-    pop_matrix=input_data$pop_data[input_data$region_labels==region,,]
-    image(x=input_data$years_labels,y=input_data$age_labels,z=pop_matrix,
-          zlim=c(0,max(pop_matrix)),xlab="Year",ylab="Age",col = colour_scale)
-    title(main=paste(region,"- estimated population by date + age"))
+    pop_matrix=input_data$pop_data[input_data$region_labels==region, , ]
+    image(x=input_data$years_labels, y=input_data$age_labels, z=pop_matrix,
+          zlim=c(0, max(pop_matrix)), xlab="Year", ylab="Age", col = colour_scale)
+    title(main=paste(region, "- estimated population by date + age"))
   }
   if(is.null(output_filename)==FALSE){dev.off()}
 
@@ -75,18 +75,18 @@ convert_model_output_combine_by_age <- function(model_output=list()){
   N_age=dim(model_output$S)[1]
   n_particles=dim(model_output$S)[2]
   t_pts=dim(model_output$S)[3]
-  blank=array(0,dim=c(n_particles,t_pts))
+  blank=array(0, dim=c(n_particles, t_pts))
   S_sum=E_sum=I_sum=R_sum=V_sum=C_sum=blank
   for(i in 1:N_age){
-    S_sum=S_sum+model_output$S[i,,]
-    E_sum=E_sum+model_output$E[i,,]
-    I_sum=I_sum+model_output$I[i,,]
-    R_sum=R_sum+model_output$R[i,,]
-    V_sum=V_sum+model_output$V[i,,]
-    C_sum=C_sum+model_output$C[i,,]
+    S_sum=S_sum+model_output$S[i, , ]
+    E_sum=E_sum+model_output$E[i, , ]
+    I_sum=I_sum+model_output$I[i, , ]
+    R_sum=R_sum+model_output$R[i, , ]
+    V_sum=V_sum+model_output$V[i, , ]
+    C_sum=C_sum+model_output$C[i, , ]
   }
 
-  return(list(day=model_output$day,year=model_output$year,S=S_sum,E=E_sum,I=I_sum,R=R_sum,V=V_sum,C=C_sum))
+  return(list(day=model_output$day, year=model_output$year, S=S_sum, E=E_sum, I=I_sum, R=R_sum, V=V_sum, C=C_sum))
 }
 #-------------------------------------------------------------------------------
 #' @title plot_model_output
@@ -113,22 +113,22 @@ plot_model_output <- function(model_output=list()){
   ylabels=10^c(-1:10)
 
   if(n_particles==1){
-    data_combined=data.frame(date_values=rep(date_values,5),
-                             label=c(rep("S",t_pts),rep("E",t_pts),rep("I",t_pts),rep("R",t_pts),rep("V",t_pts)),
-                             values=c(model_output2$S[1,],model_output2$E[1,],model_output2$I[1,],model_output2$R[1,],
-                                      model_output2$V[1,]))
+    data_combined=data.frame(date_values=rep(date_values, 5),
+                             label=c(rep("S", t_pts), rep("E", t_pts), rep("I", t_pts), rep("R", t_pts), rep("V", t_pts)),
+                             values=c(model_output2$S[1, ], model_output2$E[1, ], model_output2$I[1, ], model_output2$R[1, ],
+                                      model_output2$V[1, ]))
     data_combined$values[data_combined$values<0.1]=0
-    plot1 <- ggplot(data=data_combined,aes(x=date_values,y=log(values),group=label))+theme_bw()
-    plot1 <- plot1 + geom_line(aes(colour=label),size=1) + theme(legend.title=element_blank())
-    plot1 <- plot1 + scale_x_continuous(name="",breaks=xlabels,labels=xlabels)
-    plot1 <- plot1 + scale_y_continuous(name="",breaks=log(ylabels),labels=ylabels)
+    plot1 <- ggplot(data=data_combined, aes(x=date_values, y=log(values), group=label))+theme_bw()
+    plot1 <- plot1 + geom_line(aes(colour=label), size=1) + theme(legend.title=element_blank())
+    plot1 <- plot1 + scale_x_continuous(name="", breaks=xlabels, labels=xlabels)
+    plot1 <- plot1 + scale_y_continuous(name="", breaks=log(ylabels), labels=ylabels)
   } else {
-    data_combined=data.frame(date_values=rep(date_values,3),label=c(rep("S",t_pts),rep("R",t_pts),rep("V",t_pts)),
-                             values_mean=rep(NA,t_pts*3),values_low=rep(NA,t_pts*3),values_high=rep(NA,t_pts*3))
+    data_combined=data.frame(date_values=rep(date_values, 3), label=c(rep("S", t_pts), rep("R", t_pts), rep("V", t_pts)),
+                             values_mean=rep(NA, t_pts*3), values_low=rep(NA, t_pts*3), values_high=rep(NA, t_pts*3))
     for(i in 1:t_pts){
-      S_CI=CI(model_output2$S[,i])
-      R_CI=CI(model_output2$R[,i])
-      V_CI=CI(model_output2$V[,i])
+      S_CI=CI(model_output2$S[, i])
+      R_CI=CI(model_output2$R[, i])
+      V_CI=CI(model_output2$V[, i])
       data_combined$values_mean[i]=as.numeric(S_CI[2])
       data_combined$values_mean[i+t_pts]=as.numeric(R_CI[2])
       data_combined$values_mean[i+(2*t_pts)]=as.numeric(V_CI[2])
@@ -143,12 +143,12 @@ plot_model_output <- function(model_output=list()){
     data_combined$values_low[is.infinite(data_combined$values_low)]=NA
     data_combined$values_high=log(data_combined$values_high)
     data_combined$values_high[is.infinite(data_combined$values_high)]=NA
-    plot1 <- ggplot(data=data_combined,aes(x=date_values,y=log(values_mean),group=label))+theme_bw()
-    plot1 <- plot1 + geom_line(aes(colour=label),size=1) + theme(legend.title=element_blank())
-    plot1 <- plot1 + geom_errorbar(data=data_combined,aes(ymin=values_low,ymax=values_high,colour=label),
+    plot1 <- ggplot(data=data_combined, aes(x=date_values, y=log(values_mean), group=label))+theme_bw()
+    plot1 <- plot1 + geom_line(aes(colour=label), size=1) + theme(legend.title=element_blank())
+    plot1 <- plot1 + geom_errorbar(data=data_combined, aes(ymin=values_low, ymax=values_high, colour=label),
                                    width=(model_output$day[2]-model_output$day[1])/365.0)
-    plot1 <- plot1 + scale_x_continuous(name="",breaks=xlabels,labels=xlabels)
-    plot1 <- plot1 + scale_y_continuous(name="",breaks=log(ylabels),labels=ylabels)
+    plot1 <- plot1 + scale_x_continuous(name="", breaks=xlabels, labels=xlabels)
+    plot1 <- plot1 + scale_y_continuous(name="", breaks=log(ylabels), labels=ylabels)
   }
 
   return(plot1)
@@ -176,13 +176,13 @@ convert_model_output_tidy <- function(model_output=list()){
   date_values1=model_output$year[1]+((model_output$day-model_output$day[1]+1)/365.0)
   particle_values=date_values2=model_output$S
   for(i in 1:n_particles){
-    particle_values[,i,]=array(i,dim=c(N_age,t_pts))
-    date_values2[,i,]=array(rep(date_values1,N_age),dim=c(N_age,t_pts))
+    particle_values[, i, ]=array(i, dim=c(N_age, t_pts))
+    date_values2[, i, ]=array(rep(date_values1, N_age), dim=c(N_age, t_pts))
   }
 
-  output_frame=data.frame(age=rep(c(1:N_age),n_particles*t_pts),particle=as.vector(particle_values),
-                          date=as.vector(date_values2),S=as.vector(model_output$S),E=as.vector(model_output$E),
-                          I=as.vector(model_output$I), R=as.vector(model_output$R),V=as.vector(model_output$V))
+  output_frame=data.frame(age=rep(c(1:N_age), n_particles*t_pts), particle=as.vector(particle_values),
+                          date=as.vector(date_values2), S=as.vector(model_output$S), E=as.vector(model_output$E),
+                          I=as.vector(model_output$I), R=as.vector(model_output$R), V=as.vector(model_output$V))
 
   return(output_frame)
 }

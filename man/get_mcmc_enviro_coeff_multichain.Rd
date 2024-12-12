@@ -23,7 +23,7 @@ get_mcmc_enviro_coeff_multichain(
 \item{end_values}{Vector of end iteration values (1 per dataset) after which data discarded (defaults to chain ends)}
 
 \item{type}{Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-covariates); choose from "FOI","FOI+R0","FOI enviro","FOI+R0 enviro"}
+covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"}
 
 \item{enviro_data}{Data frame containing values of environmental covariates; set to NULL if not in use}
 }

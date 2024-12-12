@@ -17,7 +17,7 @@ get_mcmc_datasets_multichain <- function(input_folders=c()){
   datasets=list()
   for(i in c(1:length(input_folders))){
     input_folder=input_folders[i]
-    datasets[[i]] <- get_mcmc_data(input_folder,plot_graph=FALSE)
+    datasets[[i]] <- get_mcmc_data(input_folder, plot_graph=FALSE)
   }
 
   return(datasets)
@@ -39,15 +39,15 @@ get_mcmc_datasets_multichain <- function(input_folders=c()){
 #'
 #' @export
 #'
-display_multichain_progress <- function(datasets=list(),datasets_selected=c(1),burnin_values=NULL,end_values=NULL,
-                                        flag_grb=TRUE,grb_plot=FALSE){
+display_multichain_progress <- function(datasets=list(), datasets_selected=c(1), burnin_values=NULL, end_values=NULL,
+                                        flag_grb=TRUE, grb_plot=FALSE){
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   assert_that(is.logical(flag_grb))
   assert_that(is.logical(grb_plot))
   if(is.null(burnin_values)==TRUE){
-    burnin_values=rep(1,length(datasets_selected))
+    burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
   if(is.null(end_values)==TRUE){
@@ -70,29 +70,29 @@ display_multichain_progress <- function(datasets=list(),datasets_selected=c(1),b
       param_names=colnames(input_frame)[c(2:ncol(input_frame))]}
     columns=which(colnames(input_frame) %in% param_names)
 
-    mcmc_list[[i]]=mcmc(data=input_frame[,columns],start=burnin_values[i],end=end_values[i],thin=1)
+    mcmc_list[[i]]=mcmc(data=input_frame[, columns], start=burnin_values[i], end=end_values[i], thin=1)
     like_values[[n_data]]=input_frame$posterior_current[rows[[i]]]
     like_values[[n_data]][is.infinite(like_values[[n_data]])]=-10000
-    like_min=min(like_min,min(like_values[[n_data]]))
-    like_max=max(like_max,max(like_values[[n_data]]))
+    like_min=min(like_min, min(like_values[[n_data]]))
+    like_max=max(like_max, max(like_values[[n_data]]))
   }
   if(length(datasets_selected)>1 && flag_grb==TRUE){
-    diag1=gelman.diag(mcmc_list,autoburnin=FALSE)
-    MPSRF=signif(diag1$mpsrf,4)
+    diag1=gelman.diag(mcmc_list, autoburnin=FALSE)
+    MPSRF=signif(diag1$mpsrf, 4)
   } else {MPSRF=NA}
-  if(grb_plot){diag2<-gelman.plot(mcmc_list,autoburnin=FALSE,ask=FALSE,bin.width=1000,max.bins=100)} else {diag2=NULL}
+  if(grb_plot){diag2<-gelman.plot(mcmc_list, autoburnin=FALSE, ask=FALSE, bin.width=1000, max.bins=100)} else {diag2=NULL}
   title_text="Chains:"
-  for(i in 1:length(datasets_selected)){title_text=paste(title_text,datasets_selected[i],sep=" ")}
-  title_text=paste(title_text," - MPSRF = ",MPSRF,sep="")
-  matplot(x=c(1,max(end_values)),y=c(like_min,like_max),type="p",col=0,xlab="Iteration",ylab="Log posterior probability")
+  for(i in 1:length(datasets_selected)){title_text=paste(title_text, datasets_selected[i], sep=" ")}
+  title_text=paste(title_text, " - MPSRF = ", MPSRF, sep="")
+  matplot(x=c(1, max(end_values)), y=c(like_min, like_max), type="p", col=0, xlab="Iteration", ylab="Log posterior probability")
   for(i in 1:length(datasets_selected)){
     n_data=datasets_selected[i]
-    matplot(x=rows[[i]],y=like_values[[n_data]],type="l",col=n_data,add=TRUE)
+    matplot(x=rows[[i]], y=like_values[[n_data]], type="l", col=n_data, add=TRUE)
   }
   title(main=title_text)
-  legend("bottomright",legend=as.character(datasets_selected),lty=rep(1,length(datasets_selected)),col=datasets_selected)
+  legend("bottomright", legend=as.character(datasets_selected), lty=rep(1, length(datasets_selected)), col=datasets_selected)
 
-  return(list(like_values=like_values,MPSRF=MPSRF,diag_all=diag2))
+  return(list(like_values=like_values, MPSRF=MPSRF, diag_all=diag2))
 }
 #-------------------------------------------------------------------------------
 #' @title get_mcmc_FOI_R0_multichain
@@ -111,19 +111,19 @@ display_multichain_progress <- function(datasets=list(),datasets_selected=c(1),b
 #' @param burnin_values Vector of burn-in iteration values (1 per dataset) before which data discarded (defaults to 1)
 #' @param end_values Vector of end iteration values (1 per dataset) after which data discarded (defaults to chain ends)
 #' @param type Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-#'   covariates); choose from "FOI","FOI+R0","FOI enviro","FOI+R0 enviro"
+#'   covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"
 #' @param enviro_data Data frame containing values of environmental covariates; set to NULL if not in use
 #'
 #' @export
 #'
-get_mcmc_FOI_R0_multichain <- function(datasets=c(),datasets_selected=c(1),burnin_values=NULL,end_values=NULL,
-                                       type="FOI+R0",enviro_data=NULL){
+get_mcmc_FOI_R0_multichain <- function(datasets=c(), datasets_selected=c(1), burnin_values=NULL, end_values=NULL,
+                                       type="FOI+R0", enviro_data=NULL){
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   assert_that(all(enviro_data$region==sort(enviro_data$region)))
   if(is.null(burnin_values)==TRUE){
-    burnin_values=rep(1,length(datasets_selected))
+    burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
   if(is.null(end_values)==TRUE){
@@ -137,7 +137,7 @@ get_mcmc_FOI_R0_multichain <- function(datasets=c(),datasets_selected=c(1),burni
   for(i in 1:length(datasets_selected)){
     n_data=datasets_selected[i]
     lines_selected=as.integer(burnin_values[i]+c(0:(end_values[i]-burnin_values[i])))
-    outputs[[i]]=get_mcmc_FOI_R0_data(datasets[[n_data]][lines_selected,],type,enviro_data)
+    outputs[[i]]=get_mcmc_FOI_R0_data(datasets[[n_data]][lines_selected, ], type, enviro_data)
   }
 
   return(outputs)
@@ -159,18 +159,18 @@ get_mcmc_FOI_R0_multichain <- function(datasets=c(),datasets_selected=c(1),burni
 #' @param burnin_values Vector of burn-in iteration values (1 per dataset) before which data discarded (defaults to 1)
 #' @param end_values Vector of end iteration values (1 per dataset) after which data discarded (defaults to chain ends)
 #' @param type Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-#'   covariates); choose from "FOI","FOI+R0","FOI enviro","FOI+R0 enviro"
+#'   covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"
 #' @param enviro_data Data frame containing values of environmental covariates; set to NULL if not in use
 #'
 #' @export
 #'
-get_mcmc_enviro_coeff_multichain <- function(datasets=c(),datasets_selected=c(1),burnin_values=NULL,end_values=NULL,
-                                       type="FOI+R0",enviro_data=NULL){
+get_mcmc_enviro_coeff_multichain <- function(datasets=c(), datasets_selected=c(1), burnin_values=NULL, end_values=NULL,
+                                       type="FOI+R0", enviro_data=NULL){
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   if(is.null(burnin_values)==TRUE){
-    burnin_values=rep(1,length(datasets_selected))
+    burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
   if(is.null(end_values)==TRUE){
@@ -184,7 +184,7 @@ get_mcmc_enviro_coeff_multichain <- function(datasets=c(),datasets_selected=c(1)
   for(i in 1:length(datasets_selected)){
     n_data=datasets_selected[i]
     lines_selected=as.integer(burnin_values[i]+c(0:(end_values[i]-burnin_values[i])))
-    outputs[[i]]=get_mcmc_enviro_coeff_data(datasets[[n_data]][lines_selected,],type)
+    outputs[[i]]=get_mcmc_enviro_coeff_data(datasets[[n_data]][lines_selected, ], type)
   }
 
   return(outputs)
@@ -206,13 +206,13 @@ get_mcmc_enviro_coeff_multichain <- function(datasets=c(),datasets_selected=c(1)
 #'
 #' @export
 #'
-get_mcmc_additional_params_multichain <- function(datasets=c(),datasets_selected=c(1),burnin_values=NULL,
-                                                  end_values=NULL,parameters=c("vaccine_efficacy")){
+get_mcmc_additional_params_multichain <- function(datasets=c(), datasets_selected=c(1), burnin_values=NULL,
+                                                  end_values=NULL, parameters=c("vaccine_efficacy")){
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   if(is.null(burnin_values)==TRUE){
-    burnin_values=rep(1,length(datasets_selected))
+    burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
   if(is.null(end_values)==TRUE){
@@ -226,7 +226,7 @@ get_mcmc_additional_params_multichain <- function(datasets=c(),datasets_selected
   for(i in 1:length(datasets_selected)){
     n_data=datasets_selected[i]
     lines_selected=as.integer(burnin_values[i]+c(0:(end_values[i]-burnin_values[i])))
-    outputs[[i]]=datasets[[n_data]][lines_selected,colnames(datasets[[n_data]]) %in% parameters]
+    outputs[[i]]=datasets[[n_data]][lines_selected, colnames(datasets[[n_data]]) %in% parameters]
   }
 
   return(outputs)
@@ -245,23 +245,23 @@ get_mcmc_additional_params_multichain <- function(datasets=c(),datasets_selected
 #'
 #' @export
 #'
-combine_multichain <- function(datasets=list(),datasets_selected=c(1),burnin_values=NULL,end_values=NULL){
+combine_multichain <- function(datasets=list(), datasets_selected=c(1), burnin_values=NULL, end_values=NULL){
 
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   n_sets=length(datasets_selected)
 
-  if(is.null(burnin_values)==TRUE){burnin_values=rep(1,n_sets)} else {assert_that(length(burnin_values)==n_sets)}
+  if(is.null(burnin_values)==TRUE){burnin_values=rep(1, n_sets)} else {assert_that(length(burnin_values)==n_sets)}
 
   if(is.null(end_values)==TRUE){
-    end_values=rep(NA,n_sets)
+    end_values=rep(NA, n_sets)
     for(i in 1:n_sets){end_values[i]=length(datasets[[datasets_selected[i]]]$posterior_current)}
   } else {assert_that(length(end_values)==n_sets)}
 
   for(i in 1:n_sets){
-    if(i==1){data_frame=datasets[[datasets_selected[1]]][c(burnin_values[1]:end_values[1]),]} else {
-      data_frame=rbind(data_frame,datasets[[datasets_selected[i]]][c(burnin_values[i]:end_values[i]),])
+    if(i==1){data_frame=datasets[[datasets_selected[1]]][c(burnin_values[1]:end_values[1]), ]} else {
+      data_frame=rbind(data_frame, datasets[[datasets_selected[i]]][c(burnin_values[i]:end_values[i]), ])
     }
   }
 

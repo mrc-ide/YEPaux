@@ -16,7 +16,7 @@ plot_mcmc_enviro_coeff_data(
 
 \item{env_vars}{List of environmental covariates}
 
-\item{plot_type}{Type of plots to create (choose from "box","violin")}
+\item{plot_type}{Type of plots to create (choose from "box", "violin")}
 
 \item{text_size1}{Text size parameter for axis labels
 '}

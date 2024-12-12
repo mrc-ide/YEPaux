@@ -34,7 +34,7 @@ create_map(
 \item{border_colour_regions}{Colour to use for borders of regions. Set to NA if borders to be invisible.}
 
 \item{...}{Additional optional parameters: \cr
-   lat_max,lat_min,long_max,long_min: borders if not to be set default \cr
+   lat_max, lat_min, long_max, long_min: borders if not to be set default \cr
    additional_border_shapes: Shape data for optional additional borders \cr
    border_colour_additional: colour to use for additional borders if any. \cr
 '}

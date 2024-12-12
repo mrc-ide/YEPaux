@@ -11,7 +11,7 @@ get_mcmc_enviro_coeff_data(input_frame = list(), type = "FOI+R0 enviro")
 combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings}
 
 \item{type}{Type of parameter set (FOI and/or R0 coefficients associated with environmental
-  covariates); choose from "FOI enviro","FOI+R0 enviro"
+  covariates); choose from "FOI enviro", "FOI+R0 enviro"
 '}
 }
 \description{
