@@ -6,20 +6,17 @@
 \usage{
 get_mcmc_FOI_R0_data(
   input_frame = list(),
-  type = "FOI+R0",
-  enviro_data = list()
+  enviro_data_const = list(),
+  enviro_data_var = NULL
 )
 }
 \arguments{
 \item{input_frame}{Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
 combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings}
 
-\item{type}{Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"}
+\item{enviro_data_const}{TBA}
 
-\item{enviro_data}{Data frame of environmental covariate values used to calculate FOI and R0 in MCMC run, by region
-  (NOTE: the data frame should include only the relevant environmental covariates; any not used in the MCMC fit
-   should be removed)
+\item{enviro_data_var}{TBA
 '}
 }
 \description{
@@ -29,4 +26,6 @@ Extract spillover force of infection (FOI) and reproduction number (R0) values f
 This function takes in a data frame produced by functions get_mcmc_data(), truncate_mcmc_data() and/or
 combine_multichain() and calculates spillover force of infection (FOI) and reproduction number (R0) values for
 each row in the frame (representing points on the chain) based on the type of fit carried out.
+
+TBA
 }

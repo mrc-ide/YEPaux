@@ -103,79 +103,83 @@ truncate_mcmc_data <- function(input_frame=list(), rows=c(1), plot_graph=TRUE){
 #' combine_multichain() and calculates spillover force of infection (FOI) and reproduction number (R0) values for
 #' each row in the frame (representing points on the chain) based on the type of fit carried out.
 #'
+#' TBA
+#'
 #' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
 #'   combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings
-#' @param type Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-#'   covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"
-#' @param enviro_data Data frame of environmental covariate values used to calculate FOI and R0 in MCMC run, by region
-#'   (NOTE: the data frame should include only the relevant environmental covariates; any not used in the MCMC fit
-#'    should be removed)
+#' @param enviro_data_const TBA
+#' @param enviro_data_var TBA
 #' '
 #' @export
 #'
-get_mcmc_FOI_R0_data <- function(input_frame=list(), type="FOI+R0", enviro_data=list()){
+get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), enviro_data_var=NULL){
   assert_that(is.data.frame(input_frame))
-  assert_that(type %in% c("FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"))
+  assert_that(is.data.frame(enviro_data_const))
 
-  if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
-    param_names=colnames(input_frame)}
+  if("flag_accept" %in% colnames(input_frame)){
+    param_names=get_mcmc_params(input_frame)
+  } else {
+    param_names=colnames(input_frame)
+  }
   param_names=param_names[param_names != "posterior_current"]
   columns=which(colnames(input_frame) %in% param_names)
 
-  if(type %in% c("FOI enviro", "FOI+R0 enviro")){
-    assert_that(is.data.frame((enviro_data)))
-    # assert_that(all(enviro_data$region==sort(enviro_data$region)),
-    #             msg="Regions in environmental data must be in alphabetical order")
-    n_env_vars=ncol(enviro_data)-1
-    env_vars=colnames(enviro_data)[c(2:(n_env_vars+1))]
-
-    assert_that(all(param_names[c(1:n_env_vars)]==paste("FOI_", env_vars, sep="")),
-                msg="Environmental covariates in environmental data and input frame must match")
-    if(type=="FOI+R0 enviro"){assert_that(all(param_names[n_env_vars+c(1:n_env_vars)]==paste("R0_", env_vars, sep="")),
-                                          msg="Environmental covariates in environmental data and input frame must match")}
-
-    regions=enviro_data$region
-    n_regions=length(regions)
-  } else {
-    n_regions=0
-    for(i in 1:length(param_names)){
-      prefix=substr(param_names[i], 1, 3)
-      if(prefix=="FOI"){n_regions=n_regions+1}
-    }
-  }
-
+  regions=enviro_data_const$region
+  n_regions=length(regions)
   n_lines=nrow(input_frame)
-  blank=rep(NA, n_regions*n_lines)
-  output_frame=data.frame(n_region=as.factor(rep(c(1:n_regions), n_lines)), region=rep(regions, n_lines), FOI=blank)
-  if(type %in% c("FOI+R0", "FOI+R0 enviro")){
-    R0=blank
-    output_frame=cbind(output_frame, R0)}
 
-  if(type %in% c("FOI enviro", "FOI+R0 enviro")){
+  #TODO - Add assert_that functions
 
-    columns1=columns[c(1:n_env_vars)]
-    output_frame$FOI=as.vector(as.matrix(enviro_data[, c(2:(n_env_vars+1))]) %*% t(as.matrix(input_frame[, columns1])))
-    if(type=="FOI+R0 enviro"){
-      columns2=columns[c(1:n_env_vars)]+n_env_vars
-      output_frame$R0=as.vector(as.matrix(enviro_data[, c(2:(n_env_vars+1))]) %*% t(as.matrix(input_frame[, columns2])))
-    }
+  if(is.null(enviro_data_var)){
+    n_env_vars=ncol(enviro_data_const)-1
+    covar_names=colnames(enviro_data_const)[1+c(1:n_env_vars)]
 
-  } else {
-    output_frame$FOI=as.vector(t(as.matrix(input_frame[, columns[c(1:n_regions)]])))
-    if(type=="FOI+R0"){output_frame$R0=as.vector(t(as.matrix(input_frame[, columns[c(1:n_regions)+n_regions]])))}
-  }
+    assert_that(all(param_names[c(1:n_env_vars)]==paste("FOI_", covar_names, sep="")),
+                msg="Environmental covariates in environmental data and input frame must match")
+    assert_that(all(param_names[n_env_vars+c(1:n_env_vars)]==paste("R0_", covar_names, sep="")),
+                msg="Environmental covariates in environmental data and input frame must match")
+    columns_FOI=which(substr(colnames(input_frame),1,3)=="FOI")
+    columns_R0=which(substr(colnames(input_frame),1,2)=="R0")
 
-  if("m_FOI_Brazil" %in% colnames(input_frame)){
-    for(i in 1:n_regions){
-      if(substr(regions[i], 1, 3)=="BRA"){
-        lines=i+(n_regions*c(0:(n_lines-1)))
-        output_frame$FOI[lines]=output_frame$FOI[lines]*input_frame$m_FOI_Brazil
+    blank=rep(NA, n_regions*n_lines)
+    output_frame=data.frame(n_region=as.factor(rep(c(1:n_regions), n_lines)),
+                            region=rep(regions, n_lines), FOI=blank, R0=blank)
+
+    output_frame$FOI=as.vector(as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_FOI])))
+    output_frame$R0=as.vector(as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_R0])))
+
+    if("m_FOI_Brazil" %in% colnames(input_frame)){
+      for(i in 1:n_regions){
+        if(substr(regions[i], 1, 3)=="BRA"){
+          lines=i+(n_regions*c(0:(n_lines-1)))
+          output_frame$FOI[lines]=output_frame$FOI[lines]*input_frame$m_FOI_Brazil
+        }
       }
     }
-  }
+    output_frame$FOI[output_frame$FOI<0.0]=0.0
+    output_frame$R0[output_frame$R0<0.0]=0.0
 
-  output_frame$FOI[output_frame$FOI<0.0]=0.0
-  output_frame$R0[output_frame$R0<0.0]=0.0
+  }else{ #TODO - Finish coding output generation for variable input
+    # #TODO - Add assert_that
+    # const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
+    # var_covars = enviro_data_var$env_vars
+    # covar_names = c(const_covars,var_covars)
+    # n_env_vars = length(covar_names)
+    # i_FOI_const = c(1:n_env_vars)[covar_names %in% const_covars]
+    # i_FOI_var = c(1:n_env_vars)[covar_names %in% var_covars]
+    # i_R0_const = i_FOI_const + n_env_vars
+    # i_R0_var = i_FOI_var + n_env_vars
+    #
+    # #TODO - Create output structure
+    #
+    # #TODO - Edit to calculate in fewer steps for greater speed?
+    # for(line in 1:n_lines){
+    #   output_frame$FOI[]=epi_param_calc(coeffs_const = input_frame[,i_FOI_const],coeffs_var = input_frame[line,i_FOI_var],
+    #                                          enviro_data_const, enviro_data_var)
+    #   output_frame$R0[]=epi_param_calc(coeffs_const = input_frame[,i_R0_const],coeffs_var = input_frame[line,i_R0_var],
+    #                                         enviro_data_const, enviro_data_var)
+    # }
+  }
 
   #TODO - Put region names in?
 
