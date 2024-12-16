@@ -39,13 +39,16 @@ data_match_single <- function(params = c(), input_data = list(), obs_sero_data =
   input_data = input_data_process(input_data, obs_sero_data, obs_case_data)
   regions = names(table(input_data$region_labels)) #Regions in new processed input data list
   n_regions = length(regions)
-  assert_that(all(regions %in% enviro_data_const$region),
+  assert_that(all(regions %in% const_list$enviro_data_const$region),
               msg = "Time-invariant environmental data must be available for all regions in observed data")
-  enviro_data_const = subset(enviro_data_const, enviro_data_const$region %in% regions)
-  assert_that(enviro_data_var_check(enviro_data_var))
-  assert_that(all(regions %in% enviro_data_var$regions),
-              msg = "Time-variant environmental data must be available for all regions in observed data")
-  enviro_data_var = enviro_data_var_truncate(enviro_data_var,regions)
+  const_list$enviro_data_const = subset(const_list$enviro_data_const, const_list$enviro_data_const$region %in% regions)
+  if(is.null(const_list$enviro_data_var)==FALSE){
+    assert_that(enviro_data_var_check(const_list$enviro_data_var))
+    assert_that(all(regions %in% enviro_data_var$regions),
+                msg = "Time-variant environmental data must be available for all regions in observed data")
+    enviro_data_var = enviro_data_var_truncate(enviro_data_var,regions)
+  }
+
 
   frac = 1.0/const_list$n_reps
   n_params = length(params)
@@ -61,7 +64,7 @@ data_match_single <- function(params = c(), input_data = list(), obs_sero_data =
                                           p_rep_death = const_list$p_rep_death, m_FOI_Brazil = const_list$m_FOI_Brazil),
                         extra_estimated_params)
 
-  #Get additional values - TODO: Make flexible
+  #Get additional values - TODO: Make flexible?
   vaccine_efficacy = p_rep_severe = p_rep_death = m_FOI_Brazil = 1.0
   for(var_name in c("vaccine_efficacy", "p_rep_severe", "p_rep_death", "m_FOI_Brazil")){
     if(is.numeric(const_list[[var_name]]) == FALSE){
@@ -73,8 +76,8 @@ data_match_single <- function(params = c(), input_data = list(), obs_sero_data =
   }
 
   #Designate constant and variable covariates
-  const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
-  var_covars = enviro_data_var$env_vars
+  const_covars = colnames(const_list$enviro_data_const)[c(2:ncol(const_list$enviro_data_const))]
+  var_covars = const_list$enviro_data_var$env_vars
   covar_names = c(const_covars,var_covars)
   n_env_vars = length(covar_names)
   i_FOI_const = c(1:n_env_vars)[covar_names %in% const_covars]
@@ -84,10 +87,10 @@ data_match_single <- function(params = c(), input_data = list(), obs_sero_data =
 
   #Get FOI and R0 values
   FOI_values = R0_values = rep(0, n_regions)
-  FOI_values = epi_param_calc(coeffs_const = params[i_FOI_const], coeffs_var = params[i_FOI_var],
-                              enviro_data_const = enviro_data_const,enviro_data_var = enviro_data_var)
-  R0_values = epi_param_calc(coeffs_const = params[i_R0_const], coeffs_var = params[i_R0_var],
-                             enviro_data_const = enviro_data_const,enviro_data_var = enviro_data_var)
+  FOI_values = epi_param_calc(coeffs_const = as.numeric(params[i_FOI_const]), coeffs_var = params[i_FOI_var],
+                              enviro_data_const = const_list$enviro_data_const,enviro_data_var = const_list$enviro_data_var)
+  R0_values = epi_param_calc(coeffs_const = as.numeric(params[i_R0_const]), coeffs_var = params[i_R0_var],
+                             enviro_data_const = const_list$enviro_data_const,enviro_data_var = const_list$enviro_data_var)
 
   #Generate modelled data over all regions
   dataset <- Generate_Dataset(FOI_values, R0_values, input_data, obs_sero_data, obs_case_data, vaccine_efficacy,
