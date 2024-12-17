@@ -358,10 +358,9 @@ case_match_graphs <- function(model_data = list(), obs_case_data = list(), input
   obs_death_values = obs_case_data$deaths
   n_case_values = length(obs_case_values)
   n_year_values = match(obs_case_data$year, input_data$years_labels)
-  n_region_values = match(obs_case_data$region, input_data$region_labels)
   obs_case_values_low = obs_case_values_high = obs_death_values_low = obs_death_values_high = rep(NA, n_case_values)
   for(i in 1:n_case_values){
-    regions = strsplit(obs_case_data$region[i], ", ")[[1]]
+    regions = strsplit(obs_case_data$region[i], ",")[[1]]
     n_region_values = input_data$region_labels %in% regions
     population = round(sum(input_data$pop_data[n_region_values, n_year_values[i], ]), digits = 0)
     CI = prop.test(x = obs_case_data$cases[i], n = population)
