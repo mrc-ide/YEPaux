@@ -347,8 +347,7 @@ case_match_graphs <- function(model_data = list(), obs_case_data = list(), input
   if(typeof(model_data[[1]]) == "list"){
     data_type = "multi"
     n_param_sets = length(model_data)
-  } else
-  {
+  } else{
     assert_that(typeof(model_data[[1]]) == "double") #TODO - improve checks on model_data
     data_type = "single"
     n_param_sets = 1
