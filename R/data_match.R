@@ -8,13 +8,12 @@
 #' @details This function takes in observed data and produces a corresponding simulated dataset for comparison using
 #'   supplied model parameters (in the params input variable), population and vaccination settings (in the
 #'   input_data input variable) and other settings including parameter type, time increment and environmental covariate
-#'   values (in the const_list input variable). The simulated dataset will be able to be compared directly to the
+#'   values (in the consts input variable). The simulated dataset will be able to be compared directly to the
 #'   observed dataset - individual data values will be produced for the same years and regions (or combinations of
 #'   regions), seroprevalence data will be produced for the same age groups, etc.
 #'
 #' @param params Values of input parameters in order FOI/FOI coefficients, R0/R0 coefficients, [etc.]
-#' @param input_data List of population and vaccination data for multiple regions, with tables to cross-reference
-#' with observed data, added using input_data_process
+#' @param input_data List of population and vaccination data for multiple regions in standard format [TBA]
 #' @param obs_sero_data Seroprevalence data for comparison, by region, year & age group, in format no. samples/no.
 #'   positives
 #' @param obs_case_data Annual reported case/death data for comparison, by region and year, in format no. cases/no.
@@ -30,54 +29,34 @@ data_match_single <- function(params = c(), input_data = list(), obs_sero_data =
   #assert_that(all(params>0), msg = "All parameter values must be positive")
   assert_that(input_data_check(input_data),
               msg = "Input data must be in standard format (see https://mrc-ide.github.io/YEP/articles/CGuideAInputs.html )")
-  const_list<-list(...)
-  #TODO - Add additional assert_that checks?
+  consts<-list(...)
 
-  #Process input data to check that all regions with sero, case and/or outbreak data supplied are present, remove
-  #regions without any supplied data, and add cross-referencing tables for use when calculating likelihood. Take
-  #subset of environmental data (if used) and check that environmental data available for all regions
-  input_data = input_data_process(input_data, obs_sero_data, obs_case_data)
-  regions = names(table(input_data$region_labels)) #Regions in new processed input data list
-  n_regions = length(regions)
-  assert_that(all(regions %in% const_list$enviro_data_const$region),
+  # Checks
+  assert_that(is.logical(consts$deterministic))
+  assert_that(consts$mode_start %in% c(0, 1, 3),
+              msg = "mode_start must have value 0, 1 or 3 (NB 3 should be changed to 1)")
+  if(is.null(obs_case_data)==FALSE){
+    assert_that(all(obs_case_data$cases==round(obs_case_data$cases,0)),msg="Case data values must be integers")
+    assert_that(all(obs_case_data$deaths==round(obs_case_data$deaths,0)),msg="Case data values must be integers")
+  }
+  regions = regions_breakdown(c(obs_sero_data$region,obs_case_data$region))
+  n_regions=length(regions)
+  assert_that(all(regions %in% consts$enviro_data_const$region),
               msg = "Time-invariant environmental data must be available for all regions in observed data")
-  const_list$enviro_data_const = subset(const_list$enviro_data_const, const_list$enviro_data_const$region %in% regions)
-  if(is.null(const_list$enviro_data_var)==FALSE){
-    assert_that(enviro_data_var_check(const_list$enviro_data_var))
-    assert_that(all(regions %in% enviro_data_var$regions),
+  if(is.null(consts$enviro_data_var)==FALSE){
+    assert_that(enviro_data_var_check(consts$enviro_data_var))
+    assert_that(all(regions %in% consts$enviro_data_var$regions),
                 msg = "Time-variant environmental data must be available for all regions in observed data")
-    enviro_data_var = enviro_data_var_truncate(enviro_data_var,regions)
   }
 
-
-  frac = 1.0/const_list$n_reps
-  n_params = length(params)
-  extra_estimated_params = c()
-  if(is.na(const_list$vaccine_efficacy) == TRUE){extra_estimated_params = append(extra_estimated_params, "vaccine_efficacy")}
-  if(is.na(const_list$p_rep_severe) == TRUE){extra_estimated_params = append(extra_estimated_params, "p_rep_severe")}
-  if(is.na(const_list$p_rep_death) == TRUE){extra_estimated_params = append(extra_estimated_params, "p_rep_death")}
-  if(is.na(const_list$m_FOI_Brazil) == TRUE){extra_estimated_params = append(extra_estimated_params, "m_FOI_Brazil")}
-  names(params) = create_param_labels(const_list$enviro_data_const, const_list$enviro_data_var, extra_estimated_params)
-
-  checks <- mcmc_checks(params, n_regions, list(type = "zero"), const_list$enviro_data_const, const_list$enviro_data_var,
-                        add_values = list(vaccine_efficacy = const_list$vaccine_efficacy, p_rep_severe = const_list$p_rep_severe,
-                                          p_rep_death = const_list$p_rep_death, m_FOI_Brazil = const_list$m_FOI_Brazil),
-                        extra_estimated_params)
-
-  #Get additional values - TODO: Make flexible?
-  vaccine_efficacy = p_rep_severe = p_rep_death = m_FOI_Brazil = 1.0
-  for(var_name in c("vaccine_efficacy", "p_rep_severe", "p_rep_death", "m_FOI_Brazil")){
-    if(is.numeric(const_list[[var_name]]) == FALSE){
-      i = match(var_name, names(params))
-      assign(var_name, as.numeric(params[i]))
-    } else {
-      assign(var_name, const_list[[var_name]])
-    }
-  }
+  #Truncate input and environmental data to only include relevant regions
+  input_data = input_data_truncate(input_data,regions)
+  enviro_data_const = subset(enviro_data_const, enviro_data_const$region %in% regions)
+  if(is.null(enviro_data_var)==FALSE){enviro_data_var = enviro_data_var_truncate(enviro_data_var,regions)}
 
   #Designate constant and variable covariates
-  const_covars = colnames(const_list$enviro_data_const)[c(2:ncol(const_list$enviro_data_const))]
-  var_covars = const_list$enviro_data_var$env_vars
+  const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
+  var_covars = enviro_data_var$env_vars
   covar_names = c(const_covars,var_covars)
   n_env_vars = length(covar_names)
   i_FOI_const = c(1:n_env_vars)[covar_names %in% const_covars]
@@ -85,18 +64,35 @@ data_match_single <- function(params = c(), input_data = list(), obs_sero_data =
   i_R0_const = i_FOI_const + n_env_vars
   i_R0_var = i_FOI_var + n_env_vars
 
+  #frac = 1.0/consts$n_reps
+  #n_params = length(params)
+
+  #Get additional values - TODO: Make flexible?
+  vaccine_efficacy = p_severe_inf = p_death_severe_inf = p_rep_severe = p_rep_death = m_FOI_Brazil = 1.0
+  for(var_name in extra_param_names){
+    if(is.numeric(consts[[var_name]]) == FALSE){
+      i = match(var_name, names(params))
+      assign(var_name, as.numeric(params[i]))
+    } else {
+      assign(var_name, consts[[var_name]])
+    }
+  }
+
   #Get FOI and R0 values
   FOI_values = R0_values = rep(0, n_regions)
-  FOI_values = epi_param_calc(coeffs_const = as.numeric(params[i_FOI_const]), coeffs_var = params[i_FOI_var],
-                              enviro_data_const = const_list$enviro_data_const,enviro_data_var = const_list$enviro_data_var)
-  R0_values = epi_param_calc(coeffs_const = as.numeric(params[i_R0_const]), coeffs_var = params[i_R0_var],
-                             enviro_data_const = const_list$enviro_data_const,enviro_data_var = const_list$enviro_data_var)
+  FOI_values = epi_param_calc(coeffs_const = as.numeric(params[i_FOI_const]), coeffs_var = as.numeric(params[i_FOI_var]),
+                              enviro_data_const = consts$enviro_data_const,enviro_data_var = consts$enviro_data_var)
+  for(n_region in 1:n_regions){ #Apply Brazil FOI multiplier to relevant regions
+    if(substr(input_data$region_labels[n_region],1,3) == "BRA"){FOI_values[n_region] = FOI_values[n_region]*m_FOI_Brazil}
+  }
+  R0_values = epi_param_calc(coeffs_const = as.numeric(params[i_R0_const]), coeffs_var = as.numeric(params[i_R0_var]),
+                             enviro_data_const = consts$enviro_data_const,enviro_data_var = consts$enviro_data_var)
 
   #Generate modelled data over all regions
   dataset <- Generate_Dataset(FOI_values, R0_values, input_data, obs_sero_data, obs_case_data, vaccine_efficacy,
-                              const_list$time_inc, const_list$mode_start, const_list$start_SEIRV, const_list$mode_time,
-                              const_list$n_reps, const_list$deterministic, const_list$p_severe_inf, const_list$p_death_severe_inf,
-                              p_rep_severe, p_rep_death, const_list$mode_parallel, const_list$cluster, output_frame = FALSE)
+                              consts$time_inc, consts$mode_start, consts$start_SEIRV, consts$mode_time,
+                              consts$n_reps, consts$deterministic, p_severe_inf, p_death_severe_inf,
+                              p_rep_severe, p_rep_death, consts$mode_parallel, consts$cluster, output_frame = FALSE)
 
   return(dataset)
 }
@@ -109,12 +105,12 @@ data_match_single <- function(params = c(), input_data = list(), obs_sero_data =
 #' @details This function runs the data_match_single() function for multiple parameter sets. It takes in observed data
 #'   and produces corresponding simulated datasets for comparison using multiple sets of supplied model parameters (in
 #'   the param_sets input variable), population and vaccination settings (in the input_data input variable) and other
-#'   settings including parameter type, time increment and environmental covariate values (in the const_list input
+#'   settings including parameter type, time increment and environmental covariate values (in the consts input
 #'   variable). The simulated dataset will be able to be compared directly to the observed dataset - individual data
 #'   values will be produced for the same years and regions (or combinations of regions), seroprevalence data will be
 #'   produced for the same age groups, etc.
 #'
-#' @param param_sets Data frame of log values of proposed parameters, one set per row
+#' @param param_sets Data frame of values of proposed parameters, one set per row, with parameter names as headings
 #' @param input_data List of population and vaccination data for multiple regions, with tables to cross-reference
 #'   with observed data, added using input_data_process2
 #' @param obs_sero_data Seroprevalence data for comparison, by region, year & age group, in format no. samples/no.
