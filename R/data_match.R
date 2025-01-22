@@ -1,3 +1,4 @@
+extra_param_names <- c("vaccine_efficacy","p_severe_inf","p_death_severe_inf","p_rep_severe","p_rep_death","m_FOI_Brazil")
 #Functions for generating sets of modelled data to compare with observed data and displaying comparative graphs
 #-------------------------------------------------------------------------------
 #' @title data_match_single
