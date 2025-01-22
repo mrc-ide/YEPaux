@@ -2,9 +2,9 @@
 #-------------------------------------------------------------------------------
 #' @title get_mcmc_params
 #'
-#' @description Identify columns in MCMC output data containing fitted parameter values and get parameter names
+#' @description Identify columns in MCMC output data containing estimated parameter values and get parameter names
 #'
-#' @details This function takes in a dataset output by mcmc() and extracts the names of the fitted parameters as a
+#' @details This function takes in a dataset output by mcmc() and extracts the names of the estimated parameters as a
 #'   vector
 #'
 #' @param chain Data frame containing MCMC output
@@ -93,8 +93,6 @@ truncate_mcmc_data <- function(input_frame=list(), rows=c(1), plot_graph=TRUE){
   return(input_frame_truncated)
 }
 #-------------------------------------------------------------------------------
-# TODO - Update for mixed constant/variable environmental covariates
-# TODO - Get rid of different modes, assume type="FOI+R0 enviro"
 #' @title get_mcmc_FOI_R0_data
 #'
 #' @description Extract spillover force of infection (FOI) and reproduction number (R0) values from MCMC output data
@@ -141,49 +139,52 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
     columns_FOI=which(substr(colnames(input_frame),1,3)=="FOI")
     columns_R0=which(substr(colnames(input_frame),1,2)=="R0")
 
-    blank=rep(NA, n_regions*n_lines)
-    output_frame=data.frame(n_region=as.factor(rep(c(1:n_regions), n_lines)),
-                            region=rep(regions, n_lines), FOI=blank, R0=blank)
+    output = list(FOI=array(NA,dim=c(n_lines,n_regions,1)))
+    output$R0 = output$FOI
 
-    output_frame$FOI=as.vector(as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_FOI])))
-    output_frame$R0=as.vector(as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_R0])))
+    output$FOI[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_FOI]))
+    output$R0[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_R0]))
 
     if("m_FOI_Brazil" %in% colnames(input_frame)){
       for(i in 1:n_regions){
         if(substr(regions[i], 1, 3)=="BRA"){
           lines=i+(n_regions*c(0:(n_lines-1)))
-          output_frame$FOI[lines]=output_frame$FOI[lines]*input_frame$m_FOI_Brazil
+          output$FOI[lines]=output$FOI[lines]*input_frame$m_FOI_Brazil
         }
       }
     }
-    output_frame$FOI[output_frame$FOI<0.0]=0.0
-    output_frame$R0[output_frame$R0<0.0]=0.0
+    output$FOI[output$FOI<0.0]=0.0
+    output$R0[output$R0<0.0]=0.0
 
   }else{ #TODO - Finish coding output generation for variable input
-    # #TODO - Add assert_that
-    # const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
-    # var_covars = enviro_data_var$env_vars
-    # covar_names = c(const_covars,var_covars)
-    # n_env_vars = length(covar_names)
-    # i_FOI_const = c(1:n_env_vars)[covar_names %in% const_covars]
-    # i_FOI_var = c(1:n_env_vars)[covar_names %in% var_covars]
-    # i_R0_const = i_FOI_const + n_env_vars
-    # i_R0_var = i_FOI_var + n_env_vars
-    #
-    # #TODO - Create output structure
-    #
-    # #TODO - Edit to calculate in fewer steps for greater speed?
-    # for(line in 1:n_lines){
-    #   output_frame$FOI[]=epi_param_calc(coeffs_const = input_frame[,i_FOI_const],coeffs_var = input_frame[line,i_FOI_var],
-    #                                          enviro_data_const, enviro_data_var)
-    #   output_frame$R0[]=epi_param_calc(coeffs_const = input_frame[,i_R0_const],coeffs_var = input_frame[line,i_R0_var],
-    #                                         enviro_data_const, enviro_data_var)
-    # }
+    #TODO - Add assert_that
+    const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
+    var_covars = enviro_data_var$env_vars
+    n_pts=dim(enviro_data_var$values)[3]
+    covar_names = c(const_covars,var_covars)
+    n_env_vars = length(covar_names)
+    i_FOI_const = c(1:n_env_vars)[covar_names %in% const_covars]
+    i_FOI_var = c(1:n_env_vars)[covar_names %in% var_covars]
+    i_R0_const = i_FOI_const + n_env_vars
+    i_R0_var = i_FOI_var + n_env_vars
+
+    output = list(FOI=array(NA,dim=c(n_lines,n_regions,n_pts)))
+    output$R0 = output$FOI
+
+    #TODO - Edit to calculate in fewer steps for greater speed?
+    for(line in 1:n_lines){
+      output$FOI[line,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[line,i_FOI_const]),
+                                        coeffs_var = as.numeric(input_frame[line,i_FOI_var]),
+                                        enviro_data_const, enviro_data_var)
+      output$R0[line,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[line,i_R0_const]),
+                                       coeffs_var = as.numeric(input_frame[line,i_R0_var]),
+                                           enviro_data_const, enviro_data_var)
+    }
   }
 
   #TODO - Put region names in?
 
-  return(output_frame)
+  return(output)
 }
 #-------------------------------------------------------------------------------
 #' @title get_mcmc_enviro_coeff_data
@@ -196,14 +197,11 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
 #'
 #' @param input_frame Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
 #'   combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings
-#' @param type Type of parameter set (FOI and/or R0 coefficients associated with environmental
-#'   covariates); choose from "FOI enviro", "FOI+R0 enviro"
 #' '
 #' @export
 #'
-get_mcmc_enviro_coeff_data <- function(input_frame=list(), type="FOI+R0 enviro"){
+get_mcmc_enviro_coeff_data <- function(input_frame=list()){
   assert_that(is.data.frame((input_frame)))
-  assert_that(type %in% c("FOI enviro", "FOI+R0 enviro"))
 
   if("flag_accept" %in% colnames(input_frame)){param_names=get_mcmc_params(input_frame)} else {
     param_names=colnames(input_frame)}
@@ -216,18 +214,11 @@ get_mcmc_enviro_coeff_data <- function(input_frame=list(), type="FOI+R0 enviro")
 
   n_lines=nrow(input_frame)
   blank=rep(NA, n_env_vars*n_lines)
-  output_frame=data.frame(n_env_var=as.factor(rep(c(1:n_env_vars), n_lines)), env_var=blank, FOI_coeffs=blank)
+  output_frame=data.frame(n_env_var=as.factor(rep(c(1:n_env_vars), n_lines)), env_var=blank, FOI_coeffs=blank, R0_coeffs=blank)
   output_frame$env_var=env_vars[output_frame$n_env_var]
-  if(type=="FOI+R0 enviro"){
-    R0_coeffs=blank
-    output_frame=cbind(output_frame, R0_coeffs)}
 
-  columns1=columns[c(1:n_env_vars)]
-  output_frame$FOI_coeffs=as.vector(t(input_frame[, columns1]))
-  if(type=="FOI+R0 enviro"){
-    columns2=columns[c(1:n_env_vars)]+n_env_vars
-    output_frame$R0_coeffs=as.vector(t(input_frame[, columns2]))
-  }
+  output_frame$FOI_coeffs=as.vector(t(input_frame[, columns[c(1:n_env_vars)]]))
+  output_frame$R0_coeffs=as.vector(t(input_frame[, columns[c(1:n_env_vars)]+n_env_vars]))
 
   return(output_frame)
 }

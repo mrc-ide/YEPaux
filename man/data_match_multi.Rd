@@ -13,7 +13,7 @@ data_match_multi(
 )
 }
 \arguments{
-\item{param_sets}{Data frame of log values of proposed parameters, one set per row}
+\item{param_sets}{Data frame of values of proposed parameters, one set per row, with parameter names as headings}
 
 \item{input_data}{List of population and vaccination data for multiple regions, with tables to cross-reference
 with observed data, added using input_data_process2}
@@ -36,7 +36,7 @@ Function which runs the model to create simulated data corresponding to supplied
 This function runs the data_match_single() function for multiple parameter sets. It takes in observed data
   and produces corresponding simulated datasets for comparison using multiple sets of supplied model parameters (in
   the param_sets input variable), population and vaccination settings (in the input_data input variable) and other
-  settings including parameter type, time increment and environmental covariate values (in the const_list input
+  settings including parameter type, time increment and environmental covariate values (in the consts input
   variable). The simulated dataset will be able to be compared directly to the observed dataset - individual data
   values will be produced for the same years and regions (or combinations of regions), seroprevalence data will be
   produced for the same age groups, etc.

@@ -158,14 +158,11 @@ get_mcmc_FOI_R0_multichain <- function(datasets=c(), datasets_selected=c(1), bur
 #' @param datasets_selected Vector of dataset numbers to be selected from list
 #' @param burnin_values Vector of burn-in iteration values (1 per dataset) before which data discarded (defaults to 1)
 #' @param end_values Vector of end iteration values (1 per dataset) after which data discarded (defaults to chain ends)
-#' @param type Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-#'   covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"
 #' @param enviro_data Data frame containing values of environmental covariates; set to NULL if not in use
 #'
 #' @export
 #'
-get_mcmc_enviro_coeff_multichain <- function(datasets=c(), datasets_selected=c(1), burnin_values=NULL, end_values=NULL,
-                                       type="FOI+R0", enviro_data=NULL){
+get_mcmc_enviro_coeff_multichain <- function(datasets=c(), datasets_selected=c(1), burnin_values=NULL, end_values=NULL,enviro_data=NULL){
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
@@ -184,7 +181,7 @@ get_mcmc_enviro_coeff_multichain <- function(datasets=c(), datasets_selected=c(1
   for(i in 1:length(datasets_selected)){
     n_data=datasets_selected[i]
     lines_selected=as.integer(burnin_values[i]+c(0:(end_values[i]-burnin_values[i])))
-    outputs[[i]]=get_mcmc_enviro_coeff_data(datasets[[n_data]][lines_selected, ], type)
+    outputs[[i]]=get_mcmc_enviro_coeff_data(datasets[[n_data]][lines_selected, ])
   }
 
   return(outputs)

@@ -4,14 +4,11 @@
 \alias{get_mcmc_enviro_coeff_data}
 \title{get_mcmc_enviro_coeff_data}
 \usage{
-get_mcmc_enviro_coeff_data(input_frame = list(), type = "FOI+R0 enviro")
+get_mcmc_enviro_coeff_data(input_frame = list())
 }
 \arguments{
 \item{input_frame}{Data frame of MCMC output data produced by get_mcmc_data(), truncate_mcmc_data() and/or
-combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings}
-
-\item{type}{Type of parameter set (FOI and/or R0 coefficients associated with environmental
-  covariates); choose from "FOI enviro", "FOI+R0 enviro"
+  combine_multichain() OR data frame containing parameter values as columns with parameter names as column headings
 '}
 }
 \description{

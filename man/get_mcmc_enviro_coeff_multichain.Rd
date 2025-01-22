@@ -9,7 +9,6 @@ get_mcmc_enviro_coeff_multichain(
   datasets_selected = c(1),
   burnin_values = NULL,
   end_values = NULL,
-  type = "FOI+R0",
   enviro_data = NULL
 )
 }
@@ -21,9 +20,6 @@ get_mcmc_enviro_coeff_multichain(
 \item{burnin_values}{Vector of burn-in iteration values (1 per dataset) before which data discarded (defaults to 1)}
 
 \item{end_values}{Vector of end iteration values (1 per dataset) after which data discarded (defaults to chain ends)}
-
-\item{type}{Type of parameter set (FOI only, FOI+R0, FOI and/or R0 coefficients associated with environmental
-covariates); choose from "FOI", "FOI+R0", "FOI enviro", "FOI+R0 enviro"}
 
 \item{enviro_data}{Data frame containing values of environmental covariates; set to NULL if not in use}
 }

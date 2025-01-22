@@ -15,8 +15,7 @@ data_match_single(
 \arguments{
 \item{params}{Values of input parameters in order FOI/FOI coefficients, R0/R0 coefficients, [etc.]}
 
-\item{input_data}{List of population and vaccination data for multiple regions, with tables to cross-reference
-with observed data, added using input_data_process}
+\item{input_data}{List of population and vaccination data for multiple regions in standard format [TBA]}
 
 \item{obs_sero_data}{Seroprevalence data for comparison, by region, year & age group, in format no. samples/no.
 positives}
@@ -36,7 +35,7 @@ Function which runs the model to create simulated data corresponding to supplied
 This function takes in observed data and produces a corresponding simulated dataset for comparison using
   supplied model parameters (in the params input variable), population and vaccination settings (in the
   input_data input variable) and other settings including parameter type, time increment and environmental covariate
-  values (in the const_list input variable). The simulated dataset will be able to be compared directly to the
+  values (in the consts input variable). The simulated dataset will be able to be compared directly to the
   observed dataset - individual data values will be produced for the same years and regions (or combinations of
   regions), seroprevalence data will be produced for the same age groups, etc.
 }
