@@ -7,17 +7,16 @@
 #' @details This function extracts data produced by mcmc() and its subordinate functions and organizes them into
 #'   a list of datasets for further processing.
 #'
-#' @param input_folders Vector of folders to get chain data
+#' @param input_files Vector of files to get chain data
 #'
 #' @export
 #'
-get_mcmc_datasets_multichain <- function(input_folders=c()){
-  assert_that(is.character(input_folders))
+get_mcmc_datasets_multichain <- function(input_files=c()){
+  assert_that(is.character(input_files))
 
   datasets=list()
-  for(i in c(1:length(input_folders))){
-    input_folder=input_folders[i]
-    datasets[[i]] <- get_mcmc_data(input_folder, plot_graph=FALSE)
+  for(i in c(1:length(input_files))){
+    datasets[[i]] <- get_mcmc_data(input_files[i], plot_graph=FALSE)
   }
 
   return(datasets)

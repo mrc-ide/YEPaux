@@ -4,10 +4,10 @@
 \alias{get_mcmc_datasets_multichain}
 \title{get_mcmc_datasets_multichain}
 \usage{
-get_mcmc_datasets_multichain(input_folders = c())
+get_mcmc_datasets_multichain(input_files = c())
 }
 \arguments{
-\item{input_folders}{Vector of folders to get chain data}
+\item{input_files}{Vector of files to get chain data}
 }
 \description{
 Get MCMC output data from multiple chains

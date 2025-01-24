@@ -4,19 +4,18 @@
 \alias{get_mcmc_data}
 \title{get_mcmc_data}
 \usage{
-get_mcmc_data(input_folder = "", plot_graph = TRUE)
+get_mcmc_data(input_file = "", plot_graph = TRUE)
 }
 \arguments{
-\item{input_folder}{Folder containing CSV files output by mcmc()}
+\item{input_file}{Location of RDS file output by mcmc()}
 
 \item{plot_graph}{TRUE/FALSE flag indicating whether to plot graph of likelihood values
 '}
 }
 \description{
-Read MCMC results from CSV files in folder; plot likelihood graph and/or output data set
+Read MCMC results from RDS file; plot likelihood graph and/or output data set
 }
 \details{
-This function is intended to read the output of the mcmc() function saved as CSV files over the course of
-a run. It reads all CSV files in specified folder (ignoring subfolders) in alphabetical order and combines them
-into a single data frame. It  outputs the data frame and optionally plots the posterior likelihood on a graph.
+This function is intended to read the output of the mcmc() function saved as an RDS file. It  outputs the data frame and
+optionally plots the posterior likelihood on a graph.
 }

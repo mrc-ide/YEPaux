@@ -11,9 +11,9 @@ get_mcmc_params(chain = list())
 '}
 }
 \description{
-Identify columns in MCMC output data containing fitted parameter values and get parameter names
+Identify columns in MCMC output data containing estimated parameter values and get parameter names
 }
 \details{
-This function takes in a dataset output by mcmc() and extracts the names of the fitted parameters as a
+This function takes in a dataset output by mcmc() and extracts the names of the estimated parameters as a
   vector
 }

@@ -28,31 +28,24 @@ get_mcmc_params <- function(chain=list()){
 #-------------------------------------------------------------------------------
 #' @title get_mcmc_data
 #'
-#' @description Read MCMC results from CSV files in folder; plot likelihood graph and/or output data set
+#' @description Read MCMC results from RDS file; plot likelihood graph and/or output data set
 #'
-#' @details This function is intended to read the output of the mcmc() function saved as CSV files over the course of
-#' a run. It reads all CSV files in specified folder (ignoring subfolders) in alphabetical order and combines them
-#' into a single data frame. It  outputs the data frame and optionally plots the posterior likelihood on a graph.
+#' @details This function is intended to read the output of the mcmc() function saved as an RDS file. It  outputs the data frame and
+#' optionally plots the posterior likelihood on a graph.
 #'
-#' @param input_folder Folder containing CSV files output by mcmc()
+#' @param input_file Location of RDS file output by mcmc()
 #' @param plot_graph TRUE/FALSE flag indicating whether to plot graph of likelihood values
 #' '
 #' @export
 #'
-get_mcmc_data <- function(input_folder="", plot_graph=TRUE){
+get_mcmc_data <- function(input_file="", plot_graph=TRUE){
 
-  assert_that(file.exists(input_folder), msg="Valid input folder must be specified")
+  assert_that(file.exists(input_file), msg="Valid input file must be specified")
 
-  file_list=list.files(path=input_folder, pattern="*.csv")
-  input_frame=data.frame()
-  for(i in 1:length(file_list)){
-    data=read.csv(paste(input_folder, file_list[i], sep="/"), header=TRUE)
-    if(i==1){
-      param_names=get_mcmc_params(data)
-      columns=colnames(data) %in% c("posterior_current", param_names)
-    }
-    input_frame<-rbind(input_frame, data[, columns])
-  }
+  data=readRDS(input_file)
+  param_names=get_mcmc_params(data)
+  columns=colnames(data) %in% c("posterior_current", param_names)
+  input_frame=data[,columns]
 
   if(plot_graph==TRUE){
     matplot(x=c(1:nrow(input_frame)), y=input_frame$posterior_current, type="l", xlab="Iteration", ylab="LogLikelihood")}
