@@ -42,7 +42,7 @@ get_mcmc_data <- function(input_file="", plot_graph=TRUE){
 
   assert_that(file.exists(input_file), msg="Valid input file must be specified")
 
-  data=readRDS(input_file)
+  data=data.frame(readRDS(input_file))
   param_names=get_mcmc_params(data)
   columns=colnames(data) %in% c("posterior_current", param_names)
   input_frame=data[,columns]
