@@ -119,8 +119,7 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
   n_regions=length(regions)
   n_lines=nrow(input_frame)
 
-  #TODO - Add assert_that functions
-
+  output = list(regions=regions)
   if(is.null(enviro_data_var)){
     n_env_vars=ncol(enviro_data_const)-1
     covar_names=colnames(enviro_data_const)[1+c(1:n_env_vars)]
@@ -132,8 +131,7 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
     columns_FOI=which(substr(colnames(input_frame),1,3)=="FOI")
     columns_R0=which(substr(colnames(input_frame),1,2)=="R0")
 
-    output = list(FOI=array(NA,dim=c(n_lines,n_regions,1)))
-    output$R0 = output$FOI
+    output$R0 = output$FOI = array(NA,dim=c(n_lines,n_regions,1))
 
     output$FOI[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_FOI]))
     output$R0[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_R0]))
@@ -146,11 +144,9 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
         }
       }
     }
-    output$FOI[output$FOI<0.0]=0.0
-    output$R0[output$R0<0.0]=0.0
 
   }else{ #TODO - Finish coding output generation for variable input
-    #TODO - Add assert_that
+    assert_that(all(enviro_data_var$regions==regions))
     const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
     var_covars = enviro_data_var$env_vars
     n_pts=dim(enviro_data_var$values)[3]
@@ -161,8 +157,7 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
     i_R0_const = i_FOI_const + n_env_vars
     i_R0_var = i_FOI_var + n_env_vars
 
-    output = list(FOI=array(NA,dim=c(n_lines,n_regions,n_pts)))
-    output$R0 = output$FOI
+    output$R0 = output$FOI = array(NA,dim=c(n_lines,n_regions,n_pts))
 
     #TODO - Edit to calculate in fewer steps for greater speed?
     for(line in 1:n_lines){
@@ -174,8 +169,8 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
                                            enviro_data_const, enviro_data_var)
     }
   }
-
-  #TODO - Put region names in?
+  output$FOI[output$FOI<0.0]=0.0
+  output$R0[output$R0<0.0]=0.0
 
   return(output)
 }
