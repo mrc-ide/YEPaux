@@ -3,21 +3,19 @@
 #'
 #' @description Plot spillover force of infection (FOI) and reproduction number (R0) values from MCMC output data
 #'
-#' @details This function takes in a data frame of spillover force of infection (FOI) and reproduction number (R0)
+#' @details This function takes in spillover force of infection (FOI) and reproduction number (R0)
 #' values calculated from MCMC output data using the get_mcmc_FOI_R0_data() function and plots the values in one of a
 #' number of different ways to display the spread of values obtained (box plots, violin plots, simple plots with error
 #' bars, and scatter plots of FOI vs R0).
 #'
-#' @param data_frame Data frame of FOI/R0 values obtained using get_mcmc_FOI_R0_data()
-#' @param regions List of region names
+#' @param FOI_R0_values TBA
 #' @param plot_type Type of plots to create (choose from "box", "violin", "error_bars", "scatter")
 #' @param text_size1 Text size parameter for axis labels
 #' '
 #' @export
 #'
-plot_mcmc_FOI_R0_data <- function(data_frame=list(), regions=c(), plot_type="box", text_size1=10.0){
-  assert_that(is.data.frame((data_frame)))
-  assert_that(is.character(regions))
+plot_mcmc_FOI_R0_data <- function(FOI_R0_values=list(), plot_type="box", text_size1=10.0){
+
   assert_that(is.numeric(text_size1))
   if(is.null(data_frame$R0)==TRUE){
     assert_that(plot_type %in% c("box", "violin", "error_bars"))
@@ -25,43 +23,46 @@ plot_mcmc_FOI_R0_data <- function(data_frame=list(), regions=c(), plot_type="box
     assert_that(plot_type %in% c("box", "violin", "error_bars", "scatter"))
   }
 
-  #TODO - Sort out region selection/labelling
-  n_regions=length(regions)
-  assert_that(n_regions==length(names(table(data_frame$n_region))))
-  output_labels=rep(NA, n_regions)
-  for(i in 1:n_regions){output_labels[i]=substr(regions[i], 1, 5)}
+  #Convert data to single time values if needed
+  if(length(dim(FOI_R0_values$FOI))==3){
+    FOI_R0_values=list(regions=FOI_R0_values$regions,FOI=rowMeans(FOI_R0_values$FOI,dims=2),
+                       R0=rowMeans(FOI_R0_values$R0,dims=2))
+  }
+
+  #Convert data to frame
+  n_regions=length(FOI_R0_values$regions)
+  n_param_sets=dim(FOI_R0_values$FOI)[1]
+  data_frame=data.frame(n_region=as.factor(rep(c(1:n_regions),n_param_sets)),
+                        FOI=as.vector(t(FOI_R0_values$FOI)),R0=as.vector(t(FOI_R0_values$R0)))
 
   FOI_labels=10^c(-10:1)
   n_region=NULL
 
   if(plot_type %in% c("box", "violin")){
-    FOI=NULL
+    FOI=R0=NULL
     p_FOI <- ggplot(data=data_frame, aes(x=n_region, y=log(FOI))) + theme_bw()
     if(plot_type=="box"){
       p_FOI <- p_FOI+geom_boxplot(outlier.size = 0)
     } else {
-      p_FOI <- p_FOI+geom_violin(trim=FALSE, scale="width")}
-    p_FOI <- p_FOI + scale_x_discrete(name="", breaks=c(1:n_regions), labels=output_labels[c(1:n_regions)])
+      p_FOI <- p_FOI+geom_violin(trim=FALSE, scale="width")
+    }
+    p_FOI <- p_FOI + scale_x_discrete(name="", breaks=c(1:n_regions), labels=FOI_R0_values$regions)
     p_FOI <- p_FOI + scale_y_continuous(name="FOI", breaks=log(FOI_labels), labels=FOI_labels)
     p_FOI <- p_FOI + theme(axis.text.x = element_text(angle = 90, hjust=1, size=text_size1),
                            axis.text.y = element_text(size = text_size1),
                            axis.title.y = element_text(size = text_size1))
 
-    if(is.null(data_frame$R0)==FALSE){
-      R0=NULL
-      p_R0 <- ggplot(data=data_frame, aes(x=n_region, y=R0)) + theme_bw()
-      if(plot_type=="box"){
-        p_R0 <- p_R0+geom_boxplot(outlier.size = 0)
-      } else {
-        p_R0 <- p_R0+geom_violin(trim=FALSE, scale="width")
-      }
-      p_R0 <- p_R0 + scale_x_discrete(name="", breaks=c(1:n_regions), labels=output_labels[c(1:n_regions)])
-      p_R0 <- p_R0 + theme(axis.text.x = element_text(angle = 90, hjust=1, size=text_size1),
-                           axis.text.y = element_text(size = text_size1),
-                           axis.title.y = element_text(size = text_size1))
+    p_R0 <- ggplot(data=data_frame, aes(x=n_region, y=R0)) + theme_bw()
+    if(plot_type=="box"){
+      p_R0 <- p_R0+geom_boxplot(outlier.size = 0)
     } else {
-      p_R0<-NULL
+      p_R0 <- p_R0+geom_violin(trim=FALSE, scale="width")
     }
+    p_R0 <- p_R0 + scale_x_discrete(name="", breaks=c(1:n_regions), labels=FOI_R0_values$regions)
+    p_R0 <- p_R0 + theme(axis.text.x = element_text(angle = 90, hjust=1, size=text_size1),
+                         axis.text.y = element_text(size = text_size1),
+                         axis.title.y = element_text(size = text_size1))
+
     output<-list(p_FOI=p_FOI, p_R0=p_R0)
   }
 
@@ -100,23 +101,20 @@ plot_mcmc_FOI_R0_data <- function(data_frame=list(), regions=c(), plot_type="box
     }
 
     p_FOI <- ggplot(data=summary_frame_FOI, aes(x=n_region, y=log(mean))) + theme_bw()
-    p_FOI <- p_FOI + scale_x_continuous(name="", breaks=c(1:n_regions), labels=output_labels[c(1:n_regions)])
+    p_FOI <- p_FOI + scale_x_continuous(name="", breaks=c(1:n_regions), labels=FOI_R0_values$regions)
     p_FOI <- p_FOI + theme(axis.text.x = element_text(angle = 90, hjust=1, size=text_size1),
                            axis.text.y = element_text(size = text_size1))
     p_FOI <- p_FOI + scale_y_continuous(name="FOI", breaks=log(FOI_labels), labels=FOI_labels)
     p_FOI <- p_FOI + geom_line(data=summary_frame_FOI, aes(x=n_region, y=log(mean)))
     p_FOI <- p_FOI + geom_errorbar(data=summary_frame_FOI, aes(ymin=log(lower), ymax=log(upper)), width=0.5)
 
-    if(is.null(data_frame$R0)==FALSE){
-      p_R0 <- ggplot(data=summary_frame_R0, aes(x=n_region, y=mean)) + theme_bw()
-      p_R0 <- p_R0 + scale_x_continuous(name="", breaks=c(1:n_regions), labels=output_labels[c(1:n_regions)])
-      p_R0 <- p_R0 + theme(axis.text.x = element_text(angle = 90, hjust=1, size=text_size1),
-                           axis.text.y = element_text(size = text_size1))
-      p_R0 <- p_R0 + geom_line(data=summary_frame_R0, aes(x=n_region, y=mean))
-      p_R0 <- p_R0 + geom_errorbar(data=summary_frame_R0, aes(ymin=lower, ymax=upper), width=0.5)
-    } else {
-      p_R0 <- NULL
-    }
+    p_R0 <- ggplot(data=summary_frame_R0, aes(x=n_region, y=mean)) + theme_bw()
+    p_R0 <- p_R0 + scale_x_continuous(name="", breaks=c(1:n_regions), labels=FOI_R0_values$regions)
+    p_R0 <- p_R0 + theme(axis.text.x = element_text(angle = 90, hjust=1, size=text_size1),
+                         axis.text.y = element_text(size = text_size1))
+    p_R0 <- p_R0 + geom_line(data=summary_frame_R0, aes(x=n_region, y=mean))
+    p_R0 <- p_R0 + geom_errorbar(data=summary_frame_R0, aes(ymin=lower, ymax=upper), width=0.5)
+
     output<-list(p_FOI=p_FOI, p_R0=p_R0)
   }
 

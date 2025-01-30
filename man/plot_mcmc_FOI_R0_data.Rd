@@ -5,16 +5,13 @@
 \title{plot_mcmc_FOI_R0_data}
 \usage{
 plot_mcmc_FOI_R0_data(
-  data_frame = list(),
-  regions = c(),
+  FOI_R0_values = list(),
   plot_type = "box",
   text_size1 = 10
 )
 }
 \arguments{
-\item{data_frame}{Data frame of FOI/R0 values obtained using get_mcmc_FOI_R0_data()}
-
-\item{regions}{List of region names}
+\item{FOI_R0_values}{TBA}
 
 \item{plot_type}{Type of plots to create (choose from "box", "violin", "error_bars", "scatter")}
 
@@ -25,7 +22,7 @@ plot_mcmc_FOI_R0_data(
 Plot spillover force of infection (FOI) and reproduction number (R0) values from MCMC output data
 }
 \details{
-This function takes in a data frame of spillover force of infection (FOI) and reproduction number (R0)
+This function takes in spillover force of infection (FOI) and reproduction number (R0)
 values calculated from MCMC output data using the get_mcmc_FOI_R0_data() function and plots the values in one of a
 number of different ways to display the spread of values obtained (box plots, violin plots, simple plots with error
 bars, and scatter plots of FOI vs R0).
