@@ -117,7 +117,7 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
 
   regions=enviro_data_const$region
   n_regions=length(regions)
-  n_lines=nrow(input_frame)
+  n_sets=nrow(input_frame)
 
   output = list(regions=regions)
   if(is.null(enviro_data_var)){
@@ -131,21 +131,12 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
     columns_FOI=which(substr(colnames(input_frame),1,3)=="FOI")
     columns_R0=which(substr(colnames(input_frame),1,2)=="R0")
 
-    output$R0 = output$FOI = array(NA,dim=c(n_lines,n_regions,1))
+    output$R0 = output$FOI = array(NA,dim=c(n_sets,n_regions,1))
 
     output$FOI[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_FOI]))
     output$R0[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_R0]))
 
-    if("m_FOI_Brazil" %in% colnames(input_frame)){
-      for(i in 1:n_regions){
-        if(substr(regions[i], 1, 3)=="BRA"){
-          lines=i+(n_regions*c(0:(n_lines-1)))
-          output$FOI[lines]=output$FOI[lines]*input_frame$m_FOI_Brazil
-        }
-      }
-    }
-
-  }else{ #TODO - Finish coding output generation for variable input
+  }else{
     assert_that(all(enviro_data_var$regions==regions))
     const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
     var_covars = enviro_data_var$env_vars
@@ -157,18 +148,27 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
     i_R0_const = i_FOI_const + n_env_vars
     i_R0_var = i_FOI_var + n_env_vars
 
-    output$R0 = output$FOI = array(NA,dim=c(n_lines,n_regions,n_pts))
+    output$R0 = output$FOI = array(NA,dim=c(n_sets,n_regions,n_pts))
 
     #TODO - Edit to calculate in fewer steps for greater speed?
-    for(line in 1:n_lines){
-      output$FOI[line,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[line,i_FOI_const]),
-                                        coeffs_var = as.numeric(input_frame[line,i_FOI_var]),
+    for(set in 1:n_sets){
+      output$FOI[set,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[set,i_FOI_const]),
+                                        coeffs_var = as.numeric(input_frame[set,i_FOI_var]),
                                         enviro_data_const, enviro_data_var)
-      output$R0[line,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[line,i_R0_const]),
-                                       coeffs_var = as.numeric(input_frame[line,i_R0_var]),
+      output$R0[set,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[set,i_R0_const]),
+                                       coeffs_var = as.numeric(input_frame[set,i_R0_var]),
                                            enviro_data_const, enviro_data_var)
     }
   }
+
+  if("m_FOI_Brazil" %in% colnames(input_frame)){
+    for(i in 1:n_regions){
+      if(substr(regions[i], 1, 3)=="BRA"){
+        output$FOI[,i,]=output$FOI[,i,]*input_frame$m_FOI_Brazil
+      }
+    }
+  }
+
   output$FOI[output$FOI<0.0]=0.0
   output$R0[output$R0<0.0]=0.0
 
@@ -200,9 +200,9 @@ get_mcmc_enviro_coeff_data <- function(input_frame=list()){
   n_env_vars=length(columns_FOI_coeffs)
   env_vars=substr(param_names[c(1:n_env_vars)], 5, 1000)
 
-  n_lines=nrow(input_frame)
-  blank=rep(NA, n_env_vars*n_lines)
-  output_frame=data.frame(n_env_var=as.factor(rep(c(1:n_env_vars), n_lines)), env_var=blank, FOI_coeffs=blank, R0_coeffs=blank)
+  n_sets=nrow(input_frame)
+  blank=rep(NA, n_env_vars*n_sets)
+  output_frame=data.frame(n_env_var=as.factor(rep(c(1:n_env_vars), n_sets)), env_var=blank, FOI_coeffs=blank, R0_coeffs=blank)
   output_frame$env_var=env_vars[output_frame$n_env_var]
 
   output_frame$FOI_coeffs=as.vector(t(input_frame[, columns[c(1:n_env_vars)]]))
