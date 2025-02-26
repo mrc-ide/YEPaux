@@ -113,44 +113,53 @@ get_mcmc_FOI_R0_data <- function(input_frame=list(), enviro_data_const=list(), e
     param_names=colnames(input_frame)
   }
   param_names=param_names[param_names != "posterior_current"]
-  columns=which(colnames(input_frame) %in% param_names)
+  # columns=which(colnames(input_frame) %in% param_names)
 
   regions=enviro_data_const$region
   n_regions=length(regions)
   n_sets=nrow(input_frame)
 
-  output = list(regions=regions)
   if(is.null(enviro_data_var)){
     n_env_vars=ncol(enviro_data_const)-1
     covar_names=colnames(enviro_data_const)[1+c(1:n_env_vars)]
-
-    assert_that(all(param_names[c(1:n_env_vars)]==paste("FOI_", covar_names, sep="")),
-                msg="Environmental covariates in environmental data and input frame must match")
-    assert_that(all(param_names[n_env_vars+c(1:n_env_vars)]==paste("R0_", covar_names, sep="")),
-                msg="Environmental covariates in environmental data and input frame must match")
-    columns_FOI=which(substr(colnames(input_frame),1,3)=="FOI")
-    columns_R0=which(substr(colnames(input_frame),1,2)=="R0")
-
-    output$R0 = output$FOI = array(NA,dim=c(n_sets,n_regions,1))
-
-    output$FOI[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_FOI]))
-    output$R0[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,columns_R0]))
-
-  }else{
+    n_pts=1
+  } else {
     assert_that(all(enviro_data_var$regions==regions))
     const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
     var_covars = enviro_data_var$env_vars
     n_pts=dim(enviro_data_var$values)[3]
     covar_names = c(const_covars,var_covars)
     n_env_vars = length(covar_names)
+  }
+
+  assert_that(all(param_names[c(1:n_env_vars)]==paste("FOI_", covar_names, sep="")),
+              msg="Environmental covariates in environmental data and input frame must match")
+  assert_that(all(param_names[n_env_vars+c(1:n_env_vars)]==paste("R0_", covar_names, sep="")),
+              msg="Environmental covariates in environmental data and input frame must match")
+
+  output = list(regions=regions)
+  output$R0 = output$FOI = array(NA,dim=c(n_sets,n_regions,n_pts))
+  if(is.null(enviro_data_var)){
+    i_FOI_const=which(substr(colnames(input_frame),1,3)=="FOI")
+    i_R0_const=which(substr(colnames(input_frame),1,2)=="R0")
+
+    #TODO - Edit to calculate in fewer steps for greater speed?
+    for(set in 1:n_sets){
+      output$FOI[set,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[set,i_FOI_const]),
+                                       coeffs_var = c(0), enviro_data_const, NULL)
+      output$R0[set,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[set,i_R0_const]),
+                                      coeffs_var = c(0), enviro_data_const, NULL)
+    }
+
+    # output$FOI[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,i_FOI_const]))
+    # output$R0[,,1]=as.matrix(enviro_data_const[,1+c(1:n_env_vars)]) %*% t(as.matrix(input_frame[,i_R0_const]))
+
+  }else{
     i_FOI_const = c(1:n_env_vars)[covar_names %in% const_covars]
     i_FOI_var = c(1:n_env_vars)[covar_names %in% var_covars]
     i_R0_const = i_FOI_const + n_env_vars
     i_R0_var = i_FOI_var + n_env_vars
 
-    output$R0 = output$FOI = array(NA,dim=c(n_sets,n_regions,n_pts))
-
-    #TODO - Edit to calculate in fewer steps for greater speed?
     for(set in 1:n_sets){
       output$FOI[set,,]=epi_param_calc(coeffs_const = as.numeric(input_frame[set,i_FOI_const]),
                                         coeffs_var = as.numeric(input_frame[set,i_FOI_var]),
