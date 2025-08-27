@@ -23,13 +23,13 @@ extra_param_names <- c("vaccine_efficacy","p_severe_inf","p_death_severe_inf","p
 #' @export
 #'
 data_match_single2 <- function(params = c(), input_data = list(), template = list(), ...){
-  
+
   #assert_that(all(params>0), msg = "All parameter values must be positive")
   n_params=ncol(params)
   assert_that(input_data_check(input_data),
               msg = "Input data must be in standard format (see https://mrc-ide.github.io/YEP/articles/CGuideAInputs.html )")
   consts<-list(...)
-  
+
   # Checks
   assert_that(is.logical(consts$deterministic))
   assert_that(consts$mode_start %in% c(0, 1, 3),
@@ -47,27 +47,27 @@ data_match_single2 <- function(params = c(), input_data = list(), template = lis
     assert_that(all(regions %in% consts$enviro_data_var$regions),
                 msg = "Time-variant environmental data must be available for all regions in observed data")
   }
-  
+
   #Truncate input and environmental data to only include relevant regions
   input_data = input_data_truncate(input_data,regions)
   enviro_data_const = subset(enviro_data_const, enviro_data_const$region %in% regions)
   if(is.null(enviro_data_var)==FALSE){enviro_data_var = enviro_data_var_truncate(enviro_data_var,regions)}
-  
+
   #Designate constant and variable covariates
   const_covars = colnames(enviro_data_const)[c(2:ncol(enviro_data_const))]
   var_covars = enviro_data_var$env_vars
   covar_names = c(const_covars,var_covars)
   n_env_vars = length(covar_names)
   n_extra_vars = n_params - (2*n_env_vars)
-  
+
   i_FOI_const = c(1:n_env_vars)[covar_names %in% const_covars] + n_extra_vars
   i_FOI_var = c(1:n_env_vars)[covar_names %in% var_covars] + n_extra_vars
   i_R0_const = i_FOI_const + n_env_vars
   i_R0_var = i_FOI_var + n_env_vars
-  
+
   #frac = 1.0/consts$n_reps
   #n_params = length(params)
-  
+
   #Get additional values - TODO: Make flexible?
   vaccine_efficacy = p_severe_inf = p_death_severe_inf = p_rep_severe = p_rep_death = m_FOI_Brazil = 1.0
   for(var_name in extra_param_names){
@@ -78,7 +78,7 @@ data_match_single2 <- function(params = c(), input_data = list(), template = lis
       assign(var_name, consts[[var_name]])
     }
   }
-  
+
   #Get FOI and R0 values
   FOI_values = R0_values = rep(0, n_regions)
   FOI_values = epi_param_calc(coeffs_const = exp(as.numeric(params[i_FOI_const])), coeffs_var = exp(as.numeric(params[i_FOI_var])),
@@ -88,15 +88,15 @@ data_match_single2 <- function(params = c(), input_data = list(), template = lis
   }
   R0_values = epi_param_calc(coeffs_const = exp(as.numeric(params[i_R0_const])), coeffs_var = exp(as.numeric(params[i_R0_var])),
                              enviro_data_const = consts$enviro_data_const,enviro_data_var = consts$enviro_data_var)
-  
-  
+
+
   #Generate modelled data over all regions
   dataset <- Generate_Dataset(FOI_values, R0_values, input_data, template, vaccine_efficacy,
                               consts$time_inc, consts$mode_start, consts$start_SEIRV, consts$mode_time,
                               consts$n_reps, consts$deterministic, p_severe_inf, p_death_severe_inf,
                               p_rep_severe, p_rep_death, consts$mode_parallel, consts$cluster, output_frame = FALSE,
                               consts$seed, template$region_grouping)
-  
+
   return(dataset)
 }
 #-------------------------------------------------------------------------------
@@ -124,18 +124,18 @@ data_match_single2 <- function(params = c(), input_data = list(), template = lis
 #' @export
 #'
 data_match_multi2 <- function(param_sets = list(), input_data = list(), template = list(), ...){
-  
+
   #TODO - add assert_that functions?
   assert_that(is.data.frame(param_sets), msg = "param_sets must be a data frame")
-  
+
   if(is.null(template$xref_sero)){
     template$xref_sero = template_region_xref(template$sero,input_data$region_labels)
   }
   if(is.null(template$xref_case)){
     template$xref_case = template_region_xref(template$case,input_data$region_labels)
   }
-  template$region_grouping = get_region_grouping(regions,template,mode_grouping=1)
-  
+  template$region_grouping = get_region_grouping(input_data$region_labels,template,mode_grouping=1)
+
   n_param_sets = nrow(param_sets)
   model_data_all = list()
   cat("\nSet:\n")
@@ -144,6 +144,6 @@ data_match_multi2 <- function(param_sets = list(), input_data = list(), template
     params = param_sets[i, ]
     model_data_all[[i]] <- data_match_single2(params, input_data, template, ...)
   }
-  
+
   return(model_data_all)
 }
