@@ -1,4 +1,4 @@
-extra_param_names <- c("vaccine_efficacy","p_severe_inf","p_death_severe_inf","p_rep_severe","p_rep_death","m_FOI_Brazil")
+extra_param_names <- c("vaccine_efficacy","p_severe_inf","p_death_severe_inf","p_rep_severe","p_rep_death","m_FOI_BRA")
 #Functions for generating sets of modelled data to compare with observed data and displaying comparative graphs
 #-------------------------------------------------------------------------------
 #' @title data_match_single2
@@ -17,7 +17,7 @@ extra_param_names <- c("vaccine_efficacy","p_severe_inf","p_death_severe_inf","p
 #' @param input_data List of population and vaccination data for multiple regions in standard format [TBA]
 #' @param template TBA
 #' @param ... = Additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
-#'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_Brazil, deterministic, mode_time,
+#'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
 #'   mode_parallel, cluster, p_severe_inf, p_death_severe_inf)
 #'
 #' @export
@@ -69,7 +69,7 @@ data_match_single2 <- function(params = c(), input_data = list(), template = lis
   #n_params = length(params)
 
   #Get additional values - TODO: Make flexible?
-  vaccine_efficacy = p_severe_inf = p_death_severe_inf = p_rep_severe = p_rep_death = m_FOI_Brazil = 1.0
+  vaccine_efficacy = p_severe_inf = p_death_severe_inf = p_rep_severe = p_rep_death = m_FOI_BRA = 1.0
   for(var_name in extra_param_names){
     if(is.numeric(consts[[var_name]]) == FALSE){
       i = match(var_name, names(params))
@@ -84,7 +84,7 @@ data_match_single2 <- function(params = c(), input_data = list(), template = lis
   FOI_values = epi_param_calc(coeffs_const = exp(as.numeric(params[i_FOI_const])), coeffs_var = exp(as.numeric(params[i_FOI_var])),
                               enviro_data_const = consts$enviro_data_const,enviro_data_var = consts$enviro_data_var)
   for(n_region in 1:n_regions){ #Apply Brazil FOI multiplier to relevant regions
-    if(substr(input_data$region_labels[n_region],1,3) == "BRA"){FOI_values[n_region] = FOI_values[n_region]*m_FOI_Brazil}
+    if(substr(input_data$region_labels[n_region],1,3) == "BRA"){FOI_values[n_region] = FOI_values[n_region]*m_FOI_BRA}
   }
   R0_values = epi_param_calc(coeffs_const = exp(as.numeric(params[i_R0_const])), coeffs_var = exp(as.numeric(params[i_R0_var])),
                              enviro_data_const = consts$enviro_data_const,enviro_data_var = consts$enviro_data_var)
@@ -118,7 +118,7 @@ data_match_single2 <- function(params = c(), input_data = list(), template = lis
 #'   with observed data, added using input_data_process2
 #' @param template TBA
 #' @param ... = Constant additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
-#'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_Brazil, deterministic, mode_time,
+#'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
 #'   mode_parallel, cluster, p_severe_inf, p_death_severe_inf)
 #'
 #' @export
@@ -134,7 +134,7 @@ data_match_multi2 <- function(param_sets = list(), input_data = list(), template
   if(is.null(template$xref_case)){
     template$xref_case = template_region_xref(template$case,input_data$region_labels)
   }
-  template$region_grouping = get_region_grouping(input_data$region_labels,template,mode_grouping=1)
+  template$region_grouping = get_region_grouping(input_data$region_labels,template,mode_grouping=2)
 
   n_param_sets = nrow(param_sets)
   model_data_all = list()
