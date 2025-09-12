@@ -4,17 +4,25 @@
 \alias{data_match_single2}
 \title{data_match_single2}
 \usage{
-data_match_single2(params = c(), input_data = list(), template = list(), ...)
+data_match_single2(
+  params = c(),
+  input_data = list(),
+  env_covar_values = list(),
+  template = list(),
+  ...
+)
 }
 \arguments{
 \item{params}{Values of input parameters in order FOI/FOI coefficients, R0/R0 coefficients, [etc.]}
 
 \item{input_data}{List of population and vaccination data for multiple regions in standard format [TBA]}
 
+\item{env_covar_values}{TBA}
+
 \item{template}{TBA}
 
 \item{...}{= Additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
-vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_Brazil, deterministic, mode_time,
+vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
 mode_parallel, cluster, p_severe_inf, p_death_severe_inf)}
 }
 \description{
