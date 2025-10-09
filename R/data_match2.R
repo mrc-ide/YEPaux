@@ -1,4 +1,5 @@
-extra_param_names <- c("vaccine_efficacy","p_severe_inf","p_death_severe_inf","p_rep_severe","p_rep_death","m_FOI_BRA")
+extra_param_names = c("vaccine_efficacy","p_severe_inf","p_death_severe_inf",
+                      "p_rep_severe","p_rep_death")
 #Functions for generating sets of modelled data to compare with observed data and displaying comparative graphs
 #-------------------------------------------------------------------------------
 #' @title data_match_single2
@@ -30,7 +31,7 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
   n_params=ncol(params)
   assert_that(input_data_check(input_data),
               msg = "Input data must be in standard format (see https://mrc-ide.github.io/YEP/articles/CGuideAInputs.html )")
-  consts<-list(...)
+  consts<-list(...) #TODO - account for potential missing parameters
 
   # Checks
   assert_that(is.logical(consts$deterministic))
@@ -48,9 +49,9 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
   assert_that(dim(env_covar_values)[2]==n_regions)
   assert_that(length(input_data$region_labels)==n_regions)
 
-
   #Get additional values - TODO: Make flexible?
-  vaccine_efficacy = p_severe_inf = p_death_severe_inf = p_rep_severe = p_rep_death = m_FOI_BRA = 1.0
+  vaccine_efficacy = p_severe_inf = p_death_severe_inf = p_rep_severe = p_rep_death = 1.0
+
   for(var_name in extra_param_names){
     if(is.numeric(consts[[var_name]]) == FALSE){
       i = match(var_name, names(params))
@@ -61,17 +62,17 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
   }
 
   #Get FOI and R0 values
-  #TODO - get coeff indices from param names
-  i_FOI_coeffs=c(1:n_env_vars)+n_extra
-  i_R0_coeffs=i_FOI_coeffs+n_env_vars
-  FOI_values = colSums(exp(as.numeric(params[i_FOI_coeffs]))*env_covar_values)
-  R0_values = colSums(exp(as.numeric(params[i_R0_coeffs]))*env_covar_values)
-  for(n_region in 1:n_regions){ #Apply Brazil FOI multiplier to relevant regions
-    if(substr(input_data$region_labels[n_region],1,3) == "BRA"){FOI_values[n_region] = FOI_values[n_region]*m_FOI_BRA}
-  }
+  #TODO - get coeff indices from param names?
+  consts$n_r=n_regions
+  consts$ref_BRA=which(substr(input_data$region_labels,1,3)=="BRA")
+  log_FOI_coeffs=params[c(1:n_env_vars)+n_extra]
+  log_R0_coeffs=params[c(1:n_env_vars)+n_extra+n_env_vars]
+  epi_params = epi_param_calc2(pars_fixed=consts, env_covar_values, log_FOI_coeffs,
+                               log_R0_coeffs,vars_extra=params)
 
   #Generate modelled data over all regions
-  dataset <- Generate_Dataset(FOI_values, R0_values, input_data, template, vaccine_efficacy,
+  dataset <- Generate_Dataset(FOI_values = epi_params$FOI_spillover, R0_values = epi_params$R0,
+                              input_data, template, vaccine_efficacy,
                               consts$time_inc, consts$mode_start, consts$start_SEIRV, consts$mode_time,
                               consts$n_reps, consts$deterministic, p_severe_inf, p_death_severe_inf,
                               p_rep_severe, p_rep_death, consts$mode_parallel, consts$cluster, output_frame = FALSE,
