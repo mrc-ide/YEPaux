@@ -18,6 +18,7 @@ extra_param_names = c("vaccine_efficacy","p_severe_inf","p_death_severe_inf",
 #' @param input_data List of population and vaccination data for multiple regions in standard format [TBA]
 #' @param env_covar_values TBA
 #' @param template TBA
+#' @param fixed_extra TBA
 #' @param ... = Additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
 #'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
 #'   mode_parallel, cluster, p_severe_inf, p_death_severe_inf)
@@ -25,7 +26,7 @@ extra_param_names = c("vaccine_efficacy","p_severe_inf","p_death_severe_inf",
 #' @export
 #'
 data_match_single2 <- function(params = c(), input_data = list(), env_covar_values = list(),
-                               template = list(), ...){
+                               template = list(), fixed_extra = list(), ...){
 
   #assert_that(all(params>0), msg = "All parameter values must be positive")
   n_params=ncol(params)
@@ -35,8 +36,7 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
 
   # Checks
   assert_that(is.logical(consts$deterministic))
-  assert_that(consts$mode_start %in% c(0, 1, 3),
-              msg = "mode_start must have value 0, 1 or 3 (NB 3 should be changed to 1)")
+  assert_that(consts$mode_start %in% c(0, 1, 2),msg = "mode_start must have value 0, 1 or 2")
   if(is.null(template$case)==FALSE){
     assert_that(all(template$case$cases==round(template$case$cases,0)),msg="Case data values must be integers")
     assert_that(all(template$case$deaths==round(template$case$deaths,0)),msg="Case data values must be integers")
@@ -53,11 +53,12 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
   vaccine_efficacy = p_severe_inf = p_death_severe_inf = p_rep_severe = p_rep_death = 1.0
 
   for(var_name in extra_param_names){
-    if(is.numeric(consts[[var_name]]) == FALSE){
+    if(var_name %in% names(params)){
       i = match(var_name, names(params))
       assign(var_name, as.numeric(params[i]))
     } else {
-      assign(var_name, consts[[var_name]])
+      assert_that(var_name %in% names(fixed_extra))
+      assign(var_name, fixed_extra[[var_name]])
     }
   }
 
@@ -99,6 +100,7 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
 #'   with observed data, added using input_data_process2
 #' @param env_covar_values TBA
 #' @param template TBA
+#' @param fixed_extra TBA
 #' @param ... = Constant additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
 #'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
 #'   mode_parallel, cluster, p_severe_inf, p_death_severe_inf)
@@ -106,7 +108,7 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
 #' @export
 #'
 data_match_multi2 <- function(param_sets = list(), input_data = list(), env_covar_values = list(),
-                              template = list(), ...){
+                              template = list(), fixed_extra = list(), ...){
 
   #TODO - add assert_that functions?
   assert_that(is.data.frame(param_sets), msg = "param_sets must be a data frame")
@@ -125,7 +127,7 @@ data_match_multi2 <- function(param_sets = list(), input_data = list(), env_cova
   for(i in 1:n_param_sets){
     cat("\t", i)
     params = param_sets[i, ]
-    model_data_all[[i]] <- data_match_single2(params, input_data, env_covar_values, template, ...)
+    model_data_all[[i]] <- data_match_single2(params, input_data, env_covar_values, template, fixed_extra, ...)
   }
 
   return(model_data_all)

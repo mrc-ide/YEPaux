@@ -9,6 +9,7 @@ data_match_multi2(
   input_data = list(),
   env_covar_values = list(),
   template = list(),
+  fixed_extra = list(),
   ...
 )
 }
@@ -21,6 +22,8 @@ with observed data, added using input_data_process2}
 \item{env_covar_values}{TBA}
 
 \item{template}{TBA}
+
+\item{fixed_extra}{TBA}
 
 \item{...}{= Constant additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
 vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
