@@ -9,6 +9,9 @@ t_infectious <- 5 #Time cases remain infectious
 #' @importFrom assertthat assert_that
 #' @importFrom coda gelman.diag gelman.plot mcmc mcmc.list
 #' @import ggplot2
+# @importFrom ggplot2 aes element_blank element_text geom_boxplot geom_errorbar geom_line
+# @importFrom ggplot2 geom_point geom_ribbon geom_violin geom_sf ggplot labs
+# @importFrom ggplot2 scale_x_continuous scale_x_discrete scale_y_continuous theme theme_bw
 #' @importFrom graphics axis image legend matplot par title
 #' @importFrom grDevices dev.off png tiff
 #' @importFrom Rmisc CI
