@@ -99,65 +99,42 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
     for(i in 1:length(param_values)){
       scale_values[i]=findInterval(param_values[i], ap$scale_manual)
     }
-    map_values=ap$scale_manual[scale_values]
+    map_values=as.character(ap$scale_manual[scale_values])
     n_intervals=length(ap$scale_manual)-1
-    # assert_that(is.null(ap$legend_format)==FALSE)
-    # assert_that(ap$legend_format %in% c("f", "e", "pc", "integer"))
-    # if(ap$legend_format=="integer"){assert_that(is.integer(param_values) && is.integer(ap$scale_manual))}
-    # legend_labels=rep("", n_intervals)
-    # if(ap$legend_format=="integer"){
-    #   for(i in 1:n_intervals){
-    #     legend_labels[i]=paste0(ap$scale_manual[i])
-    #   }
-    # }
-    # if(ap$legend_format=="pc"){
-    #   for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(ap$scale_manual[i]*100, format="f", digits=ap$legend_dp), " - ",
-    #                                                   formatC(ap$scale_manual[i+1]*100, format="f", digits=ap$legend_dp))}
-    # }
-    # if(ap$legend_format=="f"){
-    #   for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(ap$scale_manual[i], format="f", digits=ap$legend_dp), " - ",
-    #                                                   formatC(ap$scale_manual[i+1], format="f", digits=ap$legend_dp))}
-    # }
-    # if(ap$legend_format=="e"){
-    #   for(i in 1:n_intervals){legend_labels[i]=paste0(formatC(ap$scale_manual[i], format="e", digits=ap$legend_dp), " - ",
-    #                                                   formatC(ap$scale_manual[i+1], format="e", digits=ap$legend_dp))}
-    # }
     ratio=length(ap$colour_scale_manual)/n_intervals
     values=ratio*c(1:length(ap$colour_scale_manual))[c(1:n_intervals)]
     for(i in 1:n_intervals){values[i]=max(1, floor(values[i]))}
     palette_vector=ap$colour_scale_manual[values]
-    names(palette_vector)=as.character(ap$scale_manual[c(1:n_intervals)])
+    #names(palette_vector)=as.character(ap$scale_manual[c(1:n_intervals)])
   } else {
     map_values = param_values
   }
 
   #Create graph (ggplot, new)
-  map_output <- ggplot() + geom_sf(data = shape_data,
-                                   mapping = aes(fill=map_values),
-                                   colour = border_colour_regions,
-                                   show.legend=TRUE)
-  map_output <- map_output + xlim(ap$long_min, ap$long_max) +
-    ylim(ap$lat_min, ap$lat_max)
-  if(display_axes==FALSE){map_output <- map_output+theme_void()}
+  map_output <- ggplot()
+  if(display_axes==FALSE){map_output <- map_output+theme_void()}else{map_output <- map_output+theme_linedraw()}
+  map_output <- map_output + geom_sf(data = shape_data,
+                                     mapping = aes(fill=map_values),
+                                     colour = border_colour_regions,
+                                     show.legend=TRUE)
+  map_output <- map_output + xlim(ap$long_min, ap$long_max) +  ylim(ap$lat_min, ap$lat_max)
+  map_output <- map_output + labs(fill = ap$legend_title)
+  map_output <- map_output + theme(text = element_text(size = text_size))
   if(is.null(ap$scale_manual)==FALSE){
-    # map_output <- map_output + scale_fill_continuous(palette=palette_vector,
-    #                                                  aesthetics="fill")
-    map_output <- map_output + scale_fill_manual(aesthetics="fill",
+    map_output <- map_output + scale_fill_manual(limits=as.character(ap$scale_manual[c(1:n_intervals)]),
+                                                 aesthetics="fill",
                                                  values=palette_vector,
-                                                 #breaks=as.character(ap$scale_manual),
+                                                 breaks=ap$scale_manual[c(1:n_intervals)],
                                                  na.value = "grey50")
   } else {
     map_output <- map_output + scale_fill_viridis_c(option="magma",
                                                     na.value = "grey50")
   }
-  map_output <- map_output + labs(fill = ap$legend_title)
-  #map_output <- map_output + theme(text.size = text_size)
-  #TODO - additional border shapes
-  # if(is.null(ap$additional_border_shapes)==FALSE){
-  #   map_output <- map_output + geom_sf(data=ap$additional_border_shapes$geometry,
-  #                                      fill=NULL,color=border_colour_additional)
-  # }
-
+  if(is.null(ap$additional_border_shapes)==FALSE){
+    map_output <- map_output + geom_sf(data=ap$additional_border_shapes$geometry,
+                                       col=ap$border_colour_additional,
+                                       show.legend=NA)
+  }
   if(is.null(ap$map_title)==FALSE){
     map_output <- map_output+title(main=ap$map_title)
   }

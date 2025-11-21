@@ -7,9 +7,6 @@
 create_map(
   shape_data = list(),
   param_values = c(),
-  scale = c(),
-  colour_scale = c(),
-  pixels_max = 720,
   text_size = 1,
   display_axes = FALSE,
   border_colour_regions = "grey",
@@ -21,12 +18,6 @@ create_map(
 
 \item{param_values}{Vector of parameter values for regions in shape_data}
 
-\item{scale}{Vector of scale intervals to use for param_values}
-
-\item{colour_scale}{Vector of colours with size greater than or equal to scale - used to convert scale to colours}
-
-\item{pixels_max}{Number of pixels to use for largest dimension of map}
-
 \item{text_size}{Size of text to appear in legend and titles}
 
 \item{display_axes}{TRUE/FALSE flag indicating whether to frame map and display latitude/longitude axes}
@@ -34,6 +25,8 @@ create_map(
 \item{border_colour_regions}{Colour to use for borders of regions. Set to NA if borders to be invisible.}
 
 \item{...}{Additional optional parameters: \cr
+   scale_manual Vector of scale intervals to use for param_values \cr
+   colour_scale_manual Vector of colours with size greater than or equal to scale_manual - used to convert scale_manual to colours\cr
    lat_max, lat_min, long_max, long_min: borders if not to be set default \cr
    additional_border_shapes: Shape data for optional additional borders \cr
    border_colour_additional: colour to use for additional borders if any. \cr
