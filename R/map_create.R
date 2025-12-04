@@ -75,6 +75,7 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
                        display_axes=FALSE, border_colour_regions="grey", ...){
 
   #TODO - Add additional image making options (resolution, file type sensitivity)
+  #TODO - fix text size
 
   assert_that(is.list(shape_data))
   assert_that(is.numeric(param_values))
@@ -82,6 +83,7 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
   n_regions=length(param_values)
   assert_that(n_regions==length(shape_data$geometry))
   ap=list(...) #Get additional optional parameters
+  if(ap$map_title==""){ap$map_title=NULL}
 
   #Set map dimensions
   bbox=st_bbox(shape_data)
@@ -136,7 +138,7 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
                                        show.legend=NA)
   }
   if(is.null(ap$map_title)==FALSE){
-    map_output <- map_output+title(main=ap$map_title)
+    map_output <- map_output + title(main=ap$map_title)
   }
 
   return(map_output)
