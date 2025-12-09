@@ -114,10 +114,10 @@ data_match_multi2 <- function(param_sets = list(), input_data = list(), env_cova
   #TODO - add assert_that functions?
   assert_that(is.data.frame(param_sets), msg = "param_sets must be a data frame")
 
-  if(is.null(template$xref_sero)){
+  if(is.null(template$xref_sero) && is.null(template$sero)==FALSE){
     template$xref_sero = template_region_xref(template$sero,input_data$region_labels)
   }
-  if(is.null(template$xref_case)){
+  if(is.null(template$xref_case) && is.null(template$case)==FALSE){
     template$xref_case = template_region_xref(template$case,input_data$region_labels)
   }
   template$region_grouping = get_region_grouping(input_data$region_labels,template,mode_grouping=2)
