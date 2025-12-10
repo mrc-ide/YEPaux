@@ -83,7 +83,6 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
   n_regions=length(param_values)
   assert_that(n_regions==length(shape_data$geometry))
   ap=list(...) #Get additional optional parameters
-  if(ap$map_title==""){ap$map_title=NULL}
 
   #Set map dimensions
   bbox=st_bbox(shape_data)
@@ -96,13 +95,12 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
   if(is.null(ap$scale_manual)==FALSE){
     assert_that(is.numeric(ap$scale_manual))
     assert_that(min(param_values, na.rm=TRUE)>=min(ap$scale_manual))
-    assert_that(max(param_values, na.rm=TRUE)<=max(ap$scale_manual))
     scale_values=rep(NA, length(param_values))
     for(i in 1:length(param_values)){
       scale_values[i]=findInterval(param_values[i], ap$scale_manual)
     }
     map_values=as.character(ap$scale_manual[scale_values])
-    n_intervals=length(ap$scale_manual)-1
+    n_intervals=length(ap$scale_manual)
     ratio=length(ap$colour_scale_manual)/n_intervals
     values=ratio*c(1:length(ap$colour_scale_manual))[c(1:n_intervals)]
     for(i in 1:n_intervals){values[i]=max(1, floor(values[i]))}
@@ -119,7 +117,6 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
                                      show.legend=TRUE)
   map_output <- map_output + xlim(ap$long_min, ap$long_max) +  ylim(ap$lat_min, ap$lat_max)
   map_output <- map_output + labs(fill = ap$legend_title)
-  map_output <- map_output + theme(text = element_text(size = text_size))
   if(display_axes){map_output <- map_output+theme_linedraw()}else{map_output <- map_output+theme_void()}
   if(is.null(ap$scale_manual)==FALSE){
     map_output <- map_output + scale_fill_manual(limits=as.character(ap$scale_manual[c(1:n_intervals)]),
@@ -140,6 +137,7 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
   if(is.null(ap$map_title)==FALSE){
     map_output <- map_output + title(main=ap$map_title)
   }
+  map_output <- map_output + theme(text = element_text(size = text_size))
 
   return(map_output)
 }
