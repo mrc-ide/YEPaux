@@ -67,14 +67,14 @@ map_shapes_load <- function(regions=c(), shapefiles=c(), region_label_type=""){
 #     legend_title: Title to show above legend \cr
 #     legend_format: Number format to use for scale values in legend if used \cr
 #     legend_dp: Number of decimal places to use in scale values in legend \cr
-#     legend_columns: Number of columns in which to display legend values \cr
+#     legend_position: TBA \cr
+#     legend_columns: Number of columns in which to display legend values (TBA) \cr
 #' '
 #' @export
 #'
 create_map <- function(shape_data=list(), param_values=c(), text_size=1,
                        display_axes=FALSE, border_colour_regions="grey", ...){
 
-  #TODO - Add additional image making options (resolution, file type sensitivity)
   #TODO - fix text size
 
   assert_that(is.list(shape_data))
@@ -116,8 +116,11 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
                                      colour = border_colour_regions,
                                      show.legend=TRUE)
   map_output <- map_output + xlim(ap$long_min, ap$long_max) +  ylim(ap$lat_min, ap$lat_max)
-  map_output <- map_output + labs(fill = ap$legend_title)
+  map_output <- map_output + labs(fill = ap$legend_title, title = ap$map_title)
   if(display_axes){map_output <- map_output+theme_linedraw()}else{map_output <- map_output+theme_void()}
+  if(is.null(ap$legend_position)==FALSE){
+    map_output <- map_output + theme(legend.position = ap$legend_position)
+  }
   if(is.null(ap$scale_manual)==FALSE){
     map_output <- map_output + scale_fill_manual(limits=as.character(ap$scale_manual[c(1:n_intervals)]),
                                                  aesthetics="fill",
@@ -133,9 +136,6 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
                                        fill = NA,
                                        colour=ap$border_colour_additional,
                                        show.legend=NA)
-  }
-  if(is.null(ap$map_title)==FALSE){
-    map_output <- map_output + title(main=ap$map_title)
   }
   map_output <- map_output + theme(text = element_text(size = text_size))
 
