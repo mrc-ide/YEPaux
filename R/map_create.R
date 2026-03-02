@@ -28,7 +28,7 @@ map_shapes_load <- function(regions=c(), shapefiles=c(), region_label_type=""){
     assert_that(region_label_type %in% names(shape_data), msg=paste0("Region label not found in ",
                                                                     shapefiles[i]))
     if(i==1){shape_data_all=st_sf(data.frame(region=rep(NA, n_regions),
-                                             geom=rep(shape_data$geometry[1], n_regions)))}
+                                             geometry=rep(shape_data$geometry[1], n_regions)))}
     file_regions=shape_data[[match(region_label_type, names(shape_data))]]
 
     for(n_region in 1:n_regions){
