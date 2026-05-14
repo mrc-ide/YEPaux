@@ -31,16 +31,15 @@ map_shapes_load <- function(regions=c(), shapefiles=c(), region_label_type=""){
                                              geometry=rep(shape_data$geometry[1], n_regions)))}
     file_regions=shape_data[[match(region_label_type, names(shape_data))]]
 
-    for(n_region in 1:n_regions){
+    for(n_region in 1:n_regions){ #TBC
       region=regions[n_region]
-      k=match(region, file_regions)
-      if(is.na(k)==FALSE){
+      if(region %in% file_regions){
         shape_data_all$region[n_region]=region
-        shape_data_all$geometry[n_region]=shape_data$geometry[k]
+        shape_data_all$geometry[n_region]=shape_data$geometry[match(region, file_regions)]
       }
     }
   }
-  assert_that(all(shape_data_all$region==regions), msg="Missing region data")
+  assert_that(all(regions %in% shape_data_all$region), msg="Missing region data")
 
   return(shape_data_all)
 }
