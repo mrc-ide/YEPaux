@@ -41,7 +41,7 @@ plot_region_input_data <- function(input_data = list(), region = "", data_type =
   assert_that(region %in% input_data$region_labels)
   assert_that(data_type %in% c("vacc", "pop"))
 
-  if(is.null(output_filename)==FALSE){png(output_filename, width = pixel_width, height = pixel_height)}
+  if(!is.null(output_filename)){png(output_filename, width = pixel_width, height = pixel_height)}
   if(data_type=="vacc"){
     image(x=input_data$years_labels, y=input_data$age_labels, z=input_data$vacc_data[input_data$region_labels==region, , ],
           zlim=c(0, 1), xlab="Year", ylab="Age", col = colour_scale)
@@ -52,7 +52,7 @@ plot_region_input_data <- function(input_data = list(), region = "", data_type =
           zlim=c(0, max(pop_matrix)), xlab="Year", ylab="Age", col = colour_scale)
     title(main=paste(region, "- estimated population by date + age"))
   }
-  if(is.null(output_filename)==FALSE){dev.off()}
+  if(!is.null(output_filename)){dev.off()}
 
   return(NULL)
 }
@@ -71,7 +71,7 @@ plot_region_input_data <- function(input_data = list(), region = "", data_type =
 convert_model_output_combine_by_age <- function(model_output=list()){
 
   assert_that(is.list(model_output)) #TODO - msg
-  assert_that(is.null(model_output$day)==FALSE) #TODO - msg
+  assert_that(!is.null(model_output$day)) #TODO - msg
 
   N_age=dim(model_output$S)[1]
   n_particles=dim(model_output$S)[2]
@@ -169,7 +169,7 @@ plot_model_output <- function(model_output=list()){
 convert_model_output_tidy <- function(model_output=list()){
 
   assert_that(is.list(model_output)) #TODO - msg
-  assert_that(is.null(model_output$day)==FALSE) #TODO - msg
+  assert_that(!is.null(model_output$day)) #TODO - msg
 
   N_age=dim(model_output$S)[1]
   n_particles=dim(model_output$S)[2]

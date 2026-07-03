@@ -17,7 +17,7 @@
 plot_mcmc_FOI_R0_data <- function(FOI_R0_values=list(), plot_type="box", text_size1=10.0){
 
   assert_that(is.numeric(text_size1))
-  if(is.null(data_frame$R0)==TRUE){
+  if(is.null(data_frame$R0)){
     assert_that(plot_type %in% c("box", "violin", "error_bars"))
   } else {
     assert_that(plot_type %in% c("box", "violin", "error_bars", "scatter"))
@@ -85,14 +85,14 @@ plot_mcmc_FOI_R0_data <- function(FOI_R0_values=list(), plot_type="box", text_si
     blank=rep(NA, n_regions)
     lower=upper=NULL
     summary_frame_FOI=data.frame(n_region=c(1:n_regions), mean=blank, lower=blank, upper=blank)
-    if(is.null(data_frame$R0)==FALSE){summary_frame_R0=summary_frame_FOI}
+    if(!is.null(data_frame$R0)){summary_frame_R0=summary_frame_FOI}
     for(i in 1:n_regions){
       subset=data_frame[data_frame$n_region==i, ]
       FOI_CI=exp(CI(log(subset$FOI)))
       summary_frame_FOI$mean[i]=FOI_CI[[2]]
       summary_frame_FOI$lower[i]=FOI_CI[[3]]
       summary_frame_FOI$upper[i]=FOI_CI[[1]]
-      if(is.null(data_frame$R0)==FALSE){
+      if(!is.null(data_frame$R0)){
         R0_CI=CI(subset$R0)
         summary_frame_R0$mean[i]=R0_CI[[2]]
         summary_frame_R0$lower[i]=R0_CI[[3]]
@@ -165,7 +165,7 @@ plot_mcmc_enviro_coeff_data <- function(data_frame=list(), env_vars=c(), plot_ty
                            axis.text.y = element_text(size = text_size1),
                            axis.title.y = element_text(size = text_size1))
 
-    if(is.null(data_frame$R0_coeffs)==FALSE){
+    if(!is.null(data_frame$R0_coeffs)){
       R0_coeffs=NULL
       p_R0 <- ggplot(data=data_frame, aes(x=n_env_var, y=log(R0_coeffs, 10))) + theme_bw()
       if(plot_type=="box"){

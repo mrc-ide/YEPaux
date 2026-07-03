@@ -24,7 +24,7 @@ get_FOI_R0_dist_data <- function(FOI_R0_values = list(), sorting_metric_values =
   regions=FOI_R0_values$regions
   n_regions=length(regions)
   n_entries=dim(FOI_R0_values$FOI)[1]
-  if(is.null(sorting_metric_values)==FALSE){
+  if(!is.null(sorting_metric_values)){
     assert_that(length(sorting_metric_values)==n_entries)
     sort_order=order(sorting_metric_values)
   }
@@ -43,7 +43,7 @@ get_FOI_R0_dist_data <- function(FOI_R0_values = list(), sorting_metric_values =
   n_975=max(1, floor(n_entries*0.975))
 
   for(i in 1:n_regions){
-    if(is.null(sorting_metric_values)==FALSE){
+    if(!is.null(sorting_metric_values)){
       FOI_values=FOI_R0_values$FOI[sort_order,i]
       R0_values=FOI_R0_values$R0[sort_order,i]
     } else {

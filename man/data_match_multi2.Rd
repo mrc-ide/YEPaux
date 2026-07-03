@@ -27,7 +27,7 @@ with observed data, added using input_data_process2}
 
 \item{...}{= Constant additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
 vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
-mode_parallel, cluster, p_severe_inf, p_death_severe_inf)}
+use_node_cluster, n_nodes, p_severe_inf, p_death_severe_inf)}
 }
 \description{
 Function which runs the model to create simulated data corresponding to supplied observed data for

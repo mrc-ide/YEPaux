@@ -45,11 +45,11 @@ display_multichain_progress <- function(datasets=list(), datasets_selected=c(1),
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   assert_that(is.logical(flag_grb))
   assert_that(is.logical(grb_plot))
-  if(is.null(burnin_values)==TRUE){
+  if(is.null(burnin_values)){
     burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
-  if(is.null(end_values)==TRUE){
+  if(is.null(end_values)){
     for(i in 1:length(datasets_selected)){
       end_values[i]=length(datasets[[datasets_selected[i]]]$posterior_current)
     }
@@ -121,11 +121,11 @@ get_mcmc_FOI_R0_multichain <- function(datasets=c(), datasets_selected=c(1), bur
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   assert_that(all(enviro_data$region==sort(enviro_data$region)))
-  if(is.null(burnin_values)==TRUE){
+  if(is.null(burnin_values)){
     burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
-  if(is.null(end_values)==TRUE){
+  if(is.null(end_values)){
     for(i in 1:length(datasets_selected)){
       end_values[i]=length(datasets[[datasets_selected[i]]]$posterior_current)
     }
@@ -165,11 +165,11 @@ get_mcmc_enviro_coeff_multichain <- function(datasets=c(), datasets_selected=c(1
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
-  if(is.null(burnin_values)==TRUE){
+  if(is.null(burnin_values)){
     burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
-  if(is.null(end_values)==TRUE){
+  if(is.null(end_values)){
     for(i in 1:length(datasets_selected)){
       end_values[i]=length(datasets[[datasets_selected[i]]]$posterior_current)
     }
@@ -207,11 +207,11 @@ get_mcmc_additional_params_multichain <- function(datasets=c(), datasets_selecte
   assert_that(is.list(datasets))
   assert_that(is.numeric(datasets_selected))
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
-  if(is.null(burnin_values)==TRUE){
+  if(is.null(burnin_values)){
     burnin_values=rep(1, length(datasets_selected))
   } else {
     assert_that(length(datasets_selected)==length(burnin_values))}
-  if(is.null(end_values)==TRUE){
+  if(is.null(end_values)){
     for(i in 1:length(datasets_selected)){
       end_values[i]=length(datasets[[datasets_selected[i]]]$posterior_current)
     }
@@ -248,9 +248,9 @@ combine_multichain <- function(datasets=list(), datasets_selected=c(1), burnin_v
   assert_that(all(datasets_selected %in% c(1:length(datasets))))
   n_sets=length(datasets_selected)
 
-  if(is.null(burnin_values)==TRUE){burnin_values=rep(1, n_sets)} else {assert_that(length(burnin_values)==n_sets)}
+  if(is.null(burnin_values)){burnin_values=rep(1, n_sets)} else {assert_that(length(burnin_values)==n_sets)}
 
-  if(is.null(end_values)==TRUE){
+  if(is.null(end_values)){
     end_values=rep(NA, n_sets)
     for(i in 1:n_sets){end_values[i]=length(datasets[[datasets_selected[i]]]$posterior_current)}
   } else {assert_that(length(end_values)==n_sets)}

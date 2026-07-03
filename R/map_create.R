@@ -91,7 +91,7 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
   if(is.null(ap$long_min)){ap$long_min=bbox$xmin}
 
   #Assign parameter values within scale
-  if(is.null(ap$scale_manual)==FALSE){
+  if(!is.null(ap$scale_manual)){
     assert_that(is.numeric(ap$scale_manual))
     assert_that(min(param_values, na.rm=TRUE)>=min(ap$scale_manual))
     scale_values=rep(NA, length(param_values))
@@ -117,10 +117,10 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
   map_output <- map_output + xlim(ap$long_min, ap$long_max) +  ylim(ap$lat_min, ap$lat_max)
   map_output <- map_output + labs(fill = ap$legend_title, title = ap$map_title)
   if(display_axes){map_output <- map_output+theme_linedraw()}else{map_output <- map_output+theme_void()}
-  if(is.null(ap$legend_position)==FALSE){
+  if(!is.null(ap$legend_position)){
     map_output <- map_output + theme(legend.position = ap$legend_position)
   }
-  if(is.null(ap$scale_manual)==FALSE){
+  if(!is.null(ap$scale_manual)){
     map_output <- map_output + scale_fill_manual(limits=as.character(ap$scale_manual[c(1:n_intervals)]),
                                                  aesthetics="fill",
                                                  values=palette_vector,
@@ -130,7 +130,7 @@ create_map <- function(shape_data=list(), param_values=c(), text_size=1,
     map_output <- map_output + scale_fill_viridis_c(option="magma",
                                                     na.value = "grey50")
   }
-  if(is.null(ap$additional_border_shapes)==FALSE){
+  if(!is.null(ap$additional_border_shapes)){
     map_output <- map_output + geom_sf(data=ap$additional_border_shapes$geometry,
                                        fill = NA,
                                        colour=ap$border_colour_additional,

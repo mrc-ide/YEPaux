@@ -21,7 +21,7 @@ extra_param_names = c("vaccine_efficacy","p_severe_inf","p_death_severe_inf",
 #' @param fixed_extra TBA
 #' @param ... = Additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
 #'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
-#'   mode_parallel, cluster, p_severe_inf, p_death_severe_inf)
+#'   use_node_cluster, n_nodes, p_severe_inf, p_death_severe_inf)
 #'
 #' @export
 #'
@@ -37,7 +37,7 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
   # Checks
   assert_that(is.logical(consts$deterministic))
   assert_that(consts$mode_start %in% c(0, 1, 2),msg = "mode_start must have value 0, 1 or 2")
-  if(is.null(template$case)==FALSE){
+  if(!is.null(template$case)){
     assert_that(all(template$case$cases==round(template$case$cases,0)),msg="Case data values must be integers")
     assert_that(all(template$case$deaths==round(template$case$deaths,0)),msg="Case data values must be integers")
   }
@@ -75,10 +75,11 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
   #TODO - fix Generate_Dataset to accept FOI/R0 value sets longer than needed?
   dataset <- Generate_Dataset(FOI_values = epi_params$FOI_spillover, R0_values = epi_params$R0,
                               input_data, template, vaccine_efficacy,
-                              consts$time_inc, consts$mode_start, consts$start_SEIRV, consts$mode_time,
+                              consts$time_inc, consts$mode_start, consts$mode_time,
                               consts$n_reps, consts$deterministic, p_severe_inf, p_death_severe_inf,
-                              p_rep_severe, p_rep_death, consts$mode_parallel, consts$cluster, output_frame = FALSE,
-                              consts$seed, template$region_grouping)
+                              p_rep_severe, p_rep_death,
+                              consts$use_node_cluster, consts$n_nodes, output_frame = FALSE,
+                              consts$seed, template$region_grouping, mode_grouping = 2)
 
   return(dataset)
 }
@@ -104,7 +105,7 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
 #' @param fixed_extra TBA
 #' @param ... = Constant additional parameters/flags/etc. (n_reps, mode_start, time_inc, enviro_data_const, enviro_data_var,
 #'   vaccine_efficacy, p_rep_severe, p_rep_death, m_FOI_BRA, deterministic, mode_time,
-#'   mode_parallel, cluster, p_severe_inf, p_death_severe_inf)
+#'   use_node_cluster, n_nodes, p_severe_inf, p_death_severe_inf)
 #'
 #' @export
 #'
@@ -114,10 +115,10 @@ data_match_multi2 <- function(param_sets = list(), input_data = list(), env_cova
   #TODO - add assert_that functions?
   assert_that(is.data.frame(param_sets), msg = "param_sets must be a data frame")
 
-  if(is.null(template$xref_sero) && is.null(template$sero)==FALSE){
+  if(is.null(template$xref_sero) && !is.null(template$sero)){
     template$xref_sero = template_region_xref(template$sero,input_data$region_labels)
   }
-  if(is.null(template$xref_case) && is.null(template$case)==FALSE){
+  if(is.null(template$xref_case) && !is.null(template$case)){
     template$xref_case = template_region_xref(template$case,input_data$region_labels)
   }
   template$region_grouping = get_region_grouping(input_data$region_labels,template,mode_grouping=2)
