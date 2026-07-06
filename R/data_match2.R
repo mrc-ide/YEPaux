@@ -39,7 +39,7 @@ data_match_single2 <- function(params = c(), input_data = list(), env_covar_valu
   assert_that(consts$mode_start %in% c(0, 1, 2),msg = "mode_start must have value 0, 1 or 2")
   if(!is.null(template$case)){
     assert_that(all(template$case$cases==round(template$case$cases,0)),msg="Case data values must be integers")
-    assert_that(all(template$case$deaths==round(template$case$deaths,0)),msg="Case data values must be integers")
+    assert_that(all(template$case$deaths[!is.na(template$case$deaths)]==round(template$case$deaths[!is.na(template$case$deaths)],0)),msg="Case data values must be integers")
   }
   regions = regions_breakdown(c(template$sero$region,template$case$region))
   n_regions=length(regions)
