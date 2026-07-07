@@ -121,7 +121,9 @@ data_match_multi2 <- function(param_sets = list(), input_data = list(), env_cova
   if(is.null(template$xref_case) && !is.null(template$case)){
     template$xref_case = template_region_xref(template$case,input_data$region_labels)
   }
-  template$region_grouping = get_region_grouping(input_data$region_labels,template,mode_grouping=2)
+  if(is.null(template$region_grouping)){
+    template$region_grouping = get_region_grouping(input_data$region_labels,template,mode_grouping=2)
+  }
 
   n_param_sets = nrow(param_sets)
   model_data_all = list()
