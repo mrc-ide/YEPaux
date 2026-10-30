@@ -30,6 +30,8 @@ showing 95\% and 50\% confidence intervals for mean of all values}
 
 \item{hide_observed}{If TRUE, indicates that supplied observed data is "dummy" data only supplied to indicate years
 and age ranges, and should not be plotted on the graph(s)}
+
+\item{deaths_incl}{If TRUE, plot graphs of numbers of deaths in addition to cases}
 }
 \description{
 Function to create a series of graphs comparing modelled and observed case data from results

@@ -328,6 +328,7 @@ sero_match_graphs2 <- function(model_data = list(), obs_sero_data = list(), plot
 #' @param text_size Size of text to display on graphs
 #' @param hide_observed If TRUE, indicates that supplied observed data is "dummy" data only supplied to indicate years
 #'   and age ranges, and should not be plotted on the graph(s)
+#' @param deaths_incl If TRUE, plot graphs of numbers of deaths in addition to cases
 #'
 #' @export
 #'
